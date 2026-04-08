@@ -9,19 +9,20 @@ export function Footer() {
       <div className="container mx-auto px-6 md:px-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-16">
           <div className="col-span-1 md:col-span-2">
-            <h2 className="font-serif text-3xl md:text-5xl text-white mb-6">Wheelhouse Tattoo Co.</h2>
+            <h2 className="font-serif text-3xl md:text-5xl text-white mb-6 uppercase">Wheelhouse Tattoo Co.</h2>
             <p className="text-muted-foreground max-w-sm font-sans text-lg mb-8">
-              A premium studio for those who treat their skin like a gallery wall. Walk-ins welcome, appointments preferred.
+              A premium mobile tattoo fleet operating across TN, TX, AZ, OK, and FL. We bring the studio to you.
             </p>
           </div>
           
           <div>
-            <h3 className="font-mono text-sm uppercase tracking-widest text-white mb-6">Studio</h3>
+            <h3 className="font-mono text-sm uppercase tracking-widest text-white mb-6">Operations</h3>
             <ul className="space-y-4 font-sans text-muted-foreground">
-              <li><a href="#about" className="hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#artists" className="hover:text-white transition-colors">Artists</a></li>
-              <li><a href="#work" className="hover:text-white transition-colors">Gallery</a></li>
-              <li><a href="#booking" className="hover:text-white transition-colors">Booking</a></li>
+              <li><a href="#manifesto" className="hover:text-white transition-colors">Manifesto</a></li>
+              <li><a href="#packages" className="hover:text-white transition-colors">Experiences</a></li>
+              <li><a href="#tour" className="hover:text-white transition-colors">Tour Dates</a></li>
+              <li><a href="/customer/" className="hover:text-white transition-colors">Book the Fleet</a></li>
+              <li><a href="/artist/" className="hover:text-white transition-colors">Artist Signup</a></li>
             </ul>
           </div>
           
@@ -29,8 +30,8 @@ export function Footer() {
             <h3 className="font-mono text-sm uppercase tracking-widest text-white mb-6">Connect</h3>
             <ul className="space-y-4 font-sans text-muted-foreground">
               <li><a href="#" className="hover:text-white transition-colors">Instagram</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Email Us</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">TikTok</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">dispatch@wheelhousetattoo.com</a></li>
             </ul>
           </div>
         </div>
@@ -40,7 +41,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Wheelhouse Tattoo Co.
           </p>
           <p className="text-muted-foreground font-mono text-xs uppercase tracking-widest">
-            wheelhousetattooco.com
+            Ink Meets The Road
           </p>
         </div>
       </div>

@@ -1,197 +1,227 @@
-import { useGetArtistDashboard, getGetArtistDashboardQueryKey } from "@workspace/api-client-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { Calendar, DollarSign, Clock, CheckCircle, Activity, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { useListEvents, useGetMyEventSignups, getListEventsQueryKey, getGetMyEventSignupsQueryKey, useSignUpForEvent, useWithdrawFromEvent } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Calendar, MapPin, Users, Ticket, ArrowRight, Flame, Check } from "lucide-react";
+import { Link } from "wouter";
+import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 export default function DashboardPage() {
-  const { data: dashboard, isLoading } = useGetArtistDashboard({
-    query: { queryKey: getGetArtistDashboardQueryKey() }
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: events, isLoading: isLoadingEvents } = useListEvents({ upcoming: true });
+  const { data: mySignups, isLoading: isLoadingSignups } = useGetMyEventSignups({
+    query: { queryKey: getGetMyEventSignupsQueryKey() }
   });
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="bg-card">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <Skeleton className="h-4 w-[100px]" />
-                <Skeleton className="h-4 w-4 rounded-full" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-[60px]" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card className="col-span-4 bg-card">
-            <CardHeader>
-              <CardTitle>Recent Bookings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-[150px]" />
-                      <Skeleton className="h-3 w-[100px]" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="col-span-3 bg-card">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+  const signUp = useSignUpForEvent();
+  const withdraw = useWithdrawFromEvent();
+
+  const handleSignUp = (eventId: number, title: string) => {
+    signUp.mutate(
+      { id: eventId },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Slot Claimed!",
+            description: `You're on the roster for ${title}.`,
+          });
+          queryClient.invalidateQueries({ queryKey: getListEventsQueryKey({ upcoming: true }) });
+          queryClient.invalidateQueries({ queryKey: getGetMyEventSignupsQueryKey() });
+        },
+        onError: (err: any) => {
+          toast({
+            title: "Failed to claim slot",
+            description: err.message || "Please try again later.",
+            variant: "destructive",
+          });
+        }
+      }
     );
-  }
+  };
+
+  const myEventIds = mySignups?.map(s => s.eventId) || [];
+  const nextEvent = mySignups?.length ? mySignups[0] : null;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight text-foreground">Overview</h1>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${dashboard?.totalRevenue?.toFixed(2) || '0.00'}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Requests</CardTitle>
-            <Clock className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboard?.pendingBookings || 0}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Confirmed Bookings</CardTitle>
-            <Calendar className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboard?.confirmedBookings || 0}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
-            <CheckCircle className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboard?.completedBookings || 0}</div>
-          </CardContent>
-        </Card>
+    <div className="space-y-8 pb-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black uppercase tracking-tight text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground mt-2">Welcome to the Wheelhouse Crew. Claim your slots and hit the road.</p>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Recent Bookings</CardTitle>
-            <CardDescription>Your latest booking requests and appointments.</CardDescription>
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="bg-card md:col-span-2 border-primary/20 shadow-sm shadow-primary/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="uppercase tracking-tight text-sm font-bold text-muted-foreground">Next Up For You</CardTitle>
           </CardHeader>
           <CardContent>
-            {dashboard?.recentBookings && dashboard.recentBookings.length > 0 ? (
-              <div className="space-y-6">
-                {dashboard.recentBookings.map((booking) => (
-                  <div key={booking.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-secondary-foreground font-semibold">
-                        {booking.customerName?.charAt(0) || '?'}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium leading-none">{booking.customerName}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {booking.serviceName || 'Custom Service'} • {booking.scheduledAt ? format(new Date(booking.scheduledAt), "MMM d, h:mm a") : 'No date set'}
-                        </p>
-                      </div>
+            {isLoadingSignups ? (
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            ) : nextEvent ? (
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <h3 className="text-2xl font-black tracking-tight">{nextEvent.eventTitle}</h3>
+                  <div className="flex items-center gap-4 mt-3 text-muted-foreground font-medium">
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-4 h-4 text-primary" />
+                      {nextEvent.eventDate ? format(new Date(nextEvent.eventDate), "MMM d, yyyy") : "TBD"}
                     </div>
-                    <Badge variant={booking.status === 'pending' ? 'secondary' : booking.status === 'confirmed' ? 'default' : 'outline'}>
-                      {booking.status}
-                    </Badge>
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-4 h-4 text-primary" />
+                      {nextEvent.eventCity}, {nextEvent.eventState}
+                    </div>
                   </div>
-                ))}
+                </div>
+                <Button asChild size="lg" className="w-full md:w-auto font-bold uppercase tracking-wide">
+                  <Link href="/my-events">View My Lineup</Link>
+                </Button>
               </div>
             ) : (
-              <div className="py-8 text-center text-muted-foreground flex flex-col items-center">
-                <Activity className="w-8 h-8 mb-3 opacity-20" />
-                <p>No recent bookings found.</p>
+              <div className="py-6 flex flex-col items-center justify-center text-center">
+                <Ticket className="w-10 h-10 text-muted-foreground/30 mb-3" />
+                <p className="text-lg font-medium">No upcoming gigs booked.</p>
+                <p className="text-muted-foreground mb-4">Claim a slot below to get on the road.</p>
+                <Button asChild variant="outline">
+                  <Link href="/events">Browse All Gigs</Link>
+                </Button>
               </div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks to manage your studio.</CardDescription>
+        <Card className="bg-card">
+          <CardHeader className="pb-3">
+            <CardTitle className="uppercase tracking-tight text-sm font-bold text-muted-foreground">Quick Actions</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Link href="/bookings">
-              <Button variant="outline" className="w-full justify-between h-auto py-4 group">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    <Calendar className="w-4 h-4" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-medium">Review Bookings</div>
-                    <div className="text-xs text-muted-foreground">Manage pending requests</div>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              </Button>
-            </Link>
-            <Link href="/services">
-              <Button variant="outline" className="w-full justify-between h-auto py-4 group">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    <Activity className="w-4 h-4" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-medium">Add New Service</div>
-                    <div className="text-xs text-muted-foreground">Expand your offerings</div>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              </Button>
-            </Link>
-            <Link href="/profile">
-              <Button variant="outline" className="w-full justify-between h-auto py-4 group">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    <DollarSign className="w-4 h-4" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-medium">Update Profile</div>
-                    <div className="text-xs text-muted-foreground">Edit your bio and rates</div>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              </Button>
-            </Link>
+          <CardContent className="space-y-3">
+            <Button variant="secondary" className="w-full justify-between" asChild>
+              <Link href="/profile">
+                <span>Update Profile</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+            <Button variant="secondary" className="w-full justify-between" asChild>
+              <Link href="/events">
+                <span>Browse All Gigs</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
           </CardContent>
         </Card>
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
+            <Flame className="w-6 h-6 text-primary" />
+            Hot Open Gigs
+          </h2>
+          <Button variant="link" asChild className="hidden sm:flex">
+            <Link href="/events">View All <ArrowRight className="ml-2 w-4 h-4" /></Link>
+          </Button>
+        </div>
+
+        {isLoadingEvents ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, i) => (
+              <Card key={i} className="bg-card border-border">
+                <CardHeader>
+                  <Skeleton className="h-6 w-24 mb-2" />
+                  <Skeleton className="h-6 w-full" />
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : events && events.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {events.slice(0, 6).map((event) => {
+              const isSignedUp = myEventIds.includes(event.id);
+              const isFull = event.signedUpCount >= event.artistSlots;
+              const slotsLeft = event.artistSlots - event.signedUpCount;
+
+              return (
+                <Card key={event.id} className={`flex flex-col bg-card transition-all ${isSignedUp ? 'border-primary/50' : 'hover:border-primary/30'}`}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start mb-2">
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-bold uppercase tracking-wider">
+                        PKG {event.packageType}
+                      </Badge>
+                      {isSignedUp ? (
+                        <Badge className="bg-primary text-primary-foreground font-bold uppercase">
+                          <Check className="w-3 h-3 mr-1" /> Booked
+                        </Badge>
+                      ) : (
+                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-muted-foreground">
+                          {isFull ? (
+                            <span className="text-destructive">FULL</span>
+                          ) : (
+                            <span className={slotsLeft <= 2 ? "text-primary" : ""}>{slotsLeft} SLOTS LEFT</span>
+                          )}
+                        </span>
+                      )}
+                    </div>
+                    <CardTitle className="text-xl line-clamp-1">{event.title}</CardTitle>
+                    <CardDescription className="line-clamp-2 mt-2 min-h-[40px]">
+                      {event.description || "No description provided."}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                    <div className="space-y-3 text-sm font-medium">
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <Calendar className="w-4 h-4 text-primary" />
+                        <span>{format(new Date(event.eventDate), "MMM do, yyyy")}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <MapPin className="w-4 h-4 text-primary" />
+                        <span>{event.city}, {event.state}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <Users className="w-4 h-4 text-primary" />
+                        <span>{event.signedUpCount} / {event.artistSlots} Artists</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="pt-4">
+                    {isSignedUp ? (
+                      <Button variant="secondary" className="w-full" disabled>
+                        <Check className="w-4 h-4 mr-2" />
+                        You're In
+                      </Button>
+                    ) : (
+                      <Button 
+                        className="w-full font-bold uppercase tracking-wide" 
+                        disabled={isFull || signUp.isPending}
+                        onClick={() => handleSignUp(event.id, event.title)}
+                      >
+                        {isFull ? "Roster Full" : "Claim Slot"}
+                      </Button>
+                    )}
+                  </CardFooter>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-card rounded-lg border border-border">
+            <p className="text-muted-foreground">No open gigs at the moment. Check back later.</p>
+          </div>
+        )}
       </div>
     </div>
   );

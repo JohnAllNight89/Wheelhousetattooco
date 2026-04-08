@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useUser, useClerk } from "@clerk/react";
-import { LayoutDashboard, UserCircle, Scissors, Calendar, LogOut } from "lucide-react";
+import { LayoutDashboard, UserCircle, Calendar, LogOut, Ticket } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -15,9 +15,9 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
 
   const navItems = [
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-    { href: "/bookings", label: "Bookings", icon: Calendar },
-    { href: "/services", label: "Services", icon: Scissors },
-    { href: "/profile", label: "Profile", icon: UserCircle },
+    { href: "/events", label: "Browse Gigs", icon: Ticket },
+    { href: "/my-events", label: "My Lineup", icon: Calendar },
+    { href: "/profile", label: "Artist Profile", icon: UserCircle },
   ];
 
   return (

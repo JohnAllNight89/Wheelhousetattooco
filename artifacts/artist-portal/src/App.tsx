@@ -11,8 +11,8 @@ import NotFound from "@/pages/not-found";
 import LandingPage from "./pages/landing";
 import DashboardPage from "./pages/dashboard";
 import ProfilePage from "./pages/profile";
-import ServicesPage from "./pages/services";
-import BookingsPage from "./pages/bookings";
+import EventsPage from "./pages/events";
+import MyEventsPage from "./pages/my-events";
 import SidebarLayout from "./components/layout/sidebar-layout";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -105,7 +105,7 @@ function ClerkProviderWithRoutes() {
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
       appearance={{
-        baseTheme: undefined, // Let our CSS handle it, but clerk uses its own theme mostly. We will use default dark if possible, but actually clerk provides a dark theme object. For now we leave default, it'll be fine or we can import dark.
+        baseTheme: undefined,
         variables: {
           colorPrimary: 'hsl(38, 92%, 50%)',
           colorBackground: 'hsl(240, 5%, 6%)',
@@ -125,8 +125,8 @@ function ClerkProviderWithRoutes() {
             
             <ProtectedRoute path="/dashboard" component={DashboardPage} />
             <ProtectedRoute path="/profile" component={ProfilePage} />
-            <ProtectedRoute path="/services" component={ServicesPage} />
-            <ProtectedRoute path="/bookings" component={BookingsPage} />
+            <ProtectedRoute path="/events" component={EventsPage} />
+            <ProtectedRoute path="/my-events" component={MyEventsPage} />
 
             <Route component={NotFound} />
           </Switch>

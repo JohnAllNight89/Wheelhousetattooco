@@ -10,9 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { X, Plus, Image as ImageIcon } from "lucide-react";
+import { Loader2 } from "lucide-react";
+
+const STYLES = [
+  "Traditional", "Neo-Traditional", "Blackwork", "Geometric", "Realism", 
+  "Watercolor", "Japanese", "Tribal", "Script/Lettering", "New School"
+];
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -20,9 +26,7 @@ const profileSchema = z.object({
   phone: z.string().optional(),
   state: z.string().min(2, "State is required"),
   city: z.string().min(2, "City is required"),
-  styles: z.array(z.object({ value: z.string() })).min(1, "At least one style is required"),
-  portfolioImages: z.array(z.object({ url: z.string().url("Must be a valid URL") })).optional(),
-  hourlyRate: z.coerce.number().min(0).optional(),
+  styles: z.array(z.string()).min(1, "At least one style is required"),
   available: z.boolean().default(true),
   instagramHandle: z.string().optional(),
   yearsExperience: z.coerce.number().min(0).optional(),
@@ -52,23 +56,11 @@ export default function ProfilePage() {
       phone: "",
       state: "",
       city: "",
-      styles: [{ value: "" }],
-      portfolioImages: [],
-      hourlyRate: 150,
+      styles: [],
       available: true,
       instagramHandle: "",
       yearsExperience: 0,
     }
-  });
-
-  const { fields: styleFields, append: appendStyle, remove: removeStyle } = useFieldArray({
-    name: "styles",
-    control: form.control
-  });
-
-  const { fields: imageFields, append: appendImage, remove: removeImage } = useFieldArray({
-    name: "portfolioImages",
-    control: form.control
   });
 
   useEffect(() => {
@@ -79,9 +71,7 @@ export default function ProfilePage() {
         phone: profile.phone || "",
         state: profile.state,
         city: profile.city,
-        styles: profile.styles.map(s => ({ value: s })),
-        portfolioImages: profile.portfolioImages.map(url => ({ url })),
-        hourlyRate: profile.hourlyRate || 0,
+        styles: profile.styles || [],
         available: profile.available,
         instagramHandle: profile.instagramHandle || "",
         yearsExperience: profile.yearsExperience || 0,
@@ -93,8 +83,6 @@ export default function ProfilePage() {
     upsertProfile.mutate({
       data: {
         ...data,
-        styles: data.styles.map(s => s.value).filter(Boolean),
-        portfolioImages: data.portfolioImages?.map(i => i.url).filter(Boolean),
       }
     }, {
       onSuccess: () => {
@@ -143,11 +131,11 @@ export default function ProfilePage() {
   const isFormActive = isEditing || !hasProfile;
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-20 max-w-4xl mx-auto">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Artist Profile</h1>
-          <p className="text-muted-foreground">Manage how clients see you.</p>
+          <h1 className="text-3xl font-black uppercase tracking-tight text-foreground">Artist Profile</h1>
+          <p className="text-muted-foreground mt-2">Manage your public information and availability for gigs.</p>
         </div>
         {hasProfile && !isFormActive && (
           <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
@@ -155,294 +143,220 @@ export default function ProfilePage() {
       </div>
 
       {!hasProfile && !isEditing && (
-        <div className="bg-primary/10 border border-primary/20 text-primary p-4 rounded-md mb-6">
-          <strong>Welcome!</strong> Please complete your profile to start accepting bookings.
+        <div className="bg-primary/10 border border-primary/20 text-primary p-4 rounded-md mb-6 font-medium">
+          Welcome to the crew! Please complete your profile to start claiming slots.
         </div>
       )}
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-                <CardDescription>Your core identity and contact details.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+          <Card className="bg-card">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-tight">Basic Information</CardTitle>
+              <CardDescription>Your core identity and contact details.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="uppercase text-xs font-bold tracking-wider">Professional Name</FormLabel>
+                    <FormControl>
+                      <Input disabled={!isFormActive} placeholder="Your name or moniker" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="bio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="uppercase text-xs font-bold tracking-wider">Bio</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        disabled={!isFormActive} 
+                        placeholder="Tell clients about your background, artistic philosophy, and what you love to tattoo..." 
+                        className="min-h-[120px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Professional Name</FormLabel>
+                      <FormLabel className="uppercase text-xs font-bold tracking-wider">Phone Number</FormLabel>
                       <FormControl>
-                        <Input disabled={!isFormActive} placeholder="Your name or moniker" {...field} />
+                        <Input disabled={!isFormActive} placeholder="(555) 555-5555" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
                 <FormField
                   control={form.control}
-                  name="bio"
+                  name="instagramHandle"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bio</FormLabel>
+                      <FormLabel className="uppercase text-xs font-bold tracking-wider">Instagram Handle</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          disabled={!isFormActive} 
-                          placeholder="Tell clients about your background, artistic philosophy, and what you love to tattoo..." 
-                          className="min-h-[120px]"
-                          {...field} 
-                        />
+                        <Input disabled={!isFormActive} placeholder="@yourhandle" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input disabled={!isFormActive} placeholder="(555) 555-5555" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="instagramHandle"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Instagram Handle</FormLabel>
-                        <FormControl>
-                          <Input disabled={!isFormActive} placeholder="@yourhandle" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Location</CardTitle>
-                <CardDescription>Where do you work?</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <FormControl>
-                          <Input disabled={!isFormActive} placeholder="Austin" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State</FormLabel>
-                        <FormControl>
-                          <Input disabled={!isFormActive} placeholder="TX" maxLength={2} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Professional Details</CardTitle>
-                <CardDescription>Rates and experience level.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="hourlyRate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Hourly Rate ($)</FormLabel>
-                        <FormControl>
-                          <Input disabled={!isFormActive} type="number" min="0" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="yearsExperience"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Years Experience</FormLabel>
-                        <FormControl>
-                          <Input disabled={!isFormActive} type="number" min="0" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
+          <Card className="bg-card">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-tight">Location</CardTitle>
+              <CardDescription>Where are you based?</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="available"
+                  name="city"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Accepting Bookings</FormLabel>
-                        <FormDescription>
-                          Are your books currently open?
-                        </FormDescription>
-                      </div>
+                    <FormItem>
+                      <FormLabel className="uppercase text-xs font-bold tracking-wider">City</FormLabel>
                       <FormControl>
-                        <Switch
-                          disabled={!isFormActive}
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Input disabled={!isFormActive} placeholder="Austin" {...field} />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-              </CardContent>
-            </Card>
+                <FormField
+                  control={form.control}
+                  name="state"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="uppercase text-xs font-bold tracking-wider">State</FormLabel>
+                      <FormControl>
+                        <Input disabled={!isFormActive} placeholder="TX" maxLength={2} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle>Tattoo Styles</CardTitle>
-                <CardDescription>What styles do you specialize in?</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {styleFields.map((field, index) => (
-                    <FormField
-                      key={field.id}
-                      control={form.control}
-                      name={`styles.${index}.value`}
-                      render={({ field: inputField }) => (
-                        <FormItem className="flex items-center gap-2 m-0 p-0 space-y-0">
-                          <FormControl>
-                            <div className="relative flex items-center">
-                              <Input 
-                                disabled={!isFormActive} 
-                                className="w-[180px] pr-8" 
-                                placeholder="e.g. Traditional" 
-                                {...inputField} 
-                              />
-                              {isFormActive && (
-                                <button 
-                                  type="button" 
-                                  onClick={() => removeStyle(index)}
-                                  className="absolute right-2 text-muted-foreground hover:text-destructive"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
-                {isFormActive && (
-                  <Button type="button" variant="outline" size="sm" onClick={() => appendStyle({ value: "" })}>
-                    <Plus className="w-4 h-4 mr-2" /> Add Style
-                  </Button>
+          <Card className="bg-card">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-tight">Professional Details</CardTitle>
+              <CardDescription>Experience level and availability.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <FormField
+                control={form.control}
+                name="yearsExperience"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="uppercase text-xs font-bold tracking-wider">Years Experience</FormLabel>
+                    <FormControl>
+                      <Input disabled={!isFormActive} type="number" min="0" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                {form.formState.errors.styles && (
-                  <p className="text-[0.8rem] font-medium text-destructive">{form.formState.errors.styles.message}</p>
+              />
+              
+              <FormField
+                control={form.control}
+                name="available"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base uppercase text-xs font-bold tracking-wider">Accepting Gigs</FormLabel>
+                      <FormDescription>
+                        Are you currently looking to get booked on the road?
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        disabled={!isFormActive}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
                 )}
-              </CardContent>
-            </Card>
+              />
+            </CardContent>
+          </Card>
 
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle>Portfolio Images</CardTitle>
-                <CardDescription>URLs to your best work.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  {imageFields.map((field, index) => (
-                    <FormField
-                      key={field.id}
-                      control={form.control}
-                      name={`portfolioImages.${index}.url`}
-                      render={({ field: inputField }) => (
-                        <FormItem className="m-0 p-0 space-y-2">
-                          <FormLabel className="sr-only">Image URL</FormLabel>
-                          <FormControl>
-                            <div className="relative flex items-center">
-                              <Input 
-                                disabled={!isFormActive} 
-                                className="pr-8" 
-                                placeholder="https://..." 
-                                {...inputField} 
-                              />
-                              {isFormActive && (
-                                <button 
-                                  type="button" 
-                                  onClick={() => removeImage(index)}
-                                  className="absolute right-2 text-muted-foreground hover:text-destructive"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                          {inputField.value && (
-                            <div className="mt-2 aspect-video w-full rounded-md border border-border overflow-hidden bg-muted flex items-center justify-center">
-                              <img 
-                                src={inputField.value} 
-                                alt={`Portfolio ${index}`}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).style.display = 'none';
-                                  e.currentTarget.parentElement!.classList.add('flex', 'items-center', 'justify-center');
-                                }}
-                              />
-                              <ImageIcon className="w-8 h-8 text-muted-foreground absolute -z-10" />
-                            </div>
-                          )}
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
-                {isFormActive && (
-                  <Button type="button" variant="outline" size="sm" onClick={() => appendImage({ url: "" })}>
-                    <Plus className="w-4 h-4 mr-2" /> Add Image URL
-                  </Button>
+          <Card className="bg-card">
+            <CardHeader>
+              <CardTitle className="uppercase tracking-tight">Tattoo Styles</CardTitle>
+              <CardDescription>What styles do you specialize in?</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="styles"
+                render={() => (
+                  <FormItem>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                      {STYLES.map((style) => (
+                        <FormField
+                          key={style}
+                          control={form.control}
+                          name="styles"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={style}
+                                className="flex flex-row items-start space-x-3 space-y-0"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    disabled={!isFormActive}
+                                    checked={field.value?.includes(style)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, style])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== style
+                                            )
+                                          )
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal cursor-pointer text-sm">
+                                  {style}
+                                </FormLabel>
+                              </FormItem>
+                            )
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <FormMessage className="mt-4" />
+                  </FormItem>
                 )}
-              </CardContent>
-            </Card>
-          </div>
+              />
+            </CardContent>
+          </Card>
 
           {isFormActive && (
-            <div className="flex justify-end gap-4 border-t pt-6">
+            <div className="flex justify-end gap-4">
               {hasProfile && (
                 <Button type="button" variant="ghost" onClick={() => {
                   setIsEditing(false);
@@ -451,8 +365,9 @@ export default function ProfilePage() {
                   Cancel
                 </Button>
               )}
-              <Button type="submit" disabled={upsertProfile.isPending}>
-                {upsertProfile.isPending ? "Saving..." : "Save Profile"}
+              <Button type="submit" size="lg" className="w-full md:w-auto font-bold uppercase tracking-wide px-8" disabled={upsertProfile.isPending}>
+                {upsertProfile.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                Save Profile
               </Button>
             </div>
           )}

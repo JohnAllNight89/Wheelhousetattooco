@@ -16,11 +16,10 @@ export function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: "About", href: "#about" },
-    { name: "Artists", href: "#artists" },
-    { name: "Work", href: "#work" },
-    { name: "Process", href: "#process" },
-    { name: "Location", href: "#location" },
+    { name: "Manifesto", href: "#manifesto" },
+    { name: "The Fleet", href: "#fleet" },
+    { name: "Experiences", href: "#packages" },
+    { name: "Tour Dates", href: "#tour" },
   ];
 
   return (
@@ -33,8 +32,8 @@ export function Navbar() {
       )}
     >
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-        <Link href="/" className="font-serif text-2xl font-bold tracking-tighter text-white">
-          WTC<span className="text-muted-foreground text-sm tracking-normal font-sans ml-1">.</span>
+        <Link href="/" className="font-serif text-2xl font-bold tracking-tighter text-white uppercase">
+          Wheelhouse<span className="text-primary text-2xl tracking-normal font-sans ml-1">.</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -49,10 +48,16 @@ export function Navbar() {
             </a>
           ))}
           <a
-            href="#booking"
-            className="text-sm font-mono uppercase tracking-widest bg-white text-black px-6 py-2 hover:bg-white/90 transition-colors"
+            href="/artist/"
+            className="text-sm font-mono uppercase tracking-widest text-muted-foreground hover:text-white transition-colors"
           >
-            Book Now
+            Artist Signup
+          </a>
+          <a
+            href="/customer/"
+            className="text-sm font-mono uppercase tracking-widest bg-primary text-primary-foreground px-6 py-2 hover:bg-primary/90 transition-colors"
+          >
+            Book Fleet
           </a>
         </nav>
 
@@ -79,11 +84,18 @@ export function Navbar() {
             </a>
           ))}
           <a
-            href="#booking"
+            href="/artist/"
             onClick={() => setMobileMenuOpen(false)}
-            className="text-center text-lg font-mono uppercase tracking-widest bg-white text-black px-6 py-3 hover:bg-white/90 transition-colors"
+            className="text-lg font-mono uppercase tracking-widest text-muted-foreground hover:text-white transition-colors"
           >
-            Book Now
+            Artist Signup
+          </a>
+          <a
+            href="/customer/"
+            onClick={() => setMobileMenuOpen(false)}
+            className="text-center text-lg font-mono uppercase tracking-widest bg-primary text-primary-foreground px-6 py-3 hover:bg-primary/90 transition-colors"
+          >
+            Book Fleet
           </a>
         </div>
       )}

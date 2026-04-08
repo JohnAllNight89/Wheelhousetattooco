@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Api
  * Wheelhouse Tattoo Platform API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 
 export interface Artist {
@@ -19,12 +19,11 @@ export interface Artist {
   city: string;
   styles: string[];
   portfolioImages: string[];
-  /** @nullable */
-  hourlyRate?: number | null;
   available: boolean;
   /** @nullable */
   instagramHandle?: string | null;
   /** @nullable */
   yearsExperience?: number | null;
+  approved: boolean;
   createdAt: Date;
 }

@@ -1,25 +1,30 @@
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRef } from "react";
-import { ArrowRight, MapPin, Clock, Mail } from "lucide-react";
+import { ArrowRight, MapPin, Calendar, Users, Truck, Sparkles, Crosshair, Droplet, Shield, Zap } from "lucide-react";
+import { useListPackages, useListEvents } from "@workspace/api-client-react";
+import { format } from "date-fns";
 
 export default function Home() {
   const containerRef = useRef(null);
   
+  const { data: packages = [], isLoading: packagesLoading } = useListPackages();
+  const { data: events = [], isLoading: eventsLoading } = useListEvents({ upcoming: true });
+
   return (
-    <div ref={containerRef} className="min-h-screen bg-background text-foreground selection:bg-white selection:text-black">
+    <div ref={containerRef} className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white">
       <div className="bg-noise"></div>
       <Navbar />
 
       <main>
-        {/* Hero Section */}
+        {/* 1. Hero Section */}
         <section className="relative h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-black/60 z-10" />
+            <div className="absolute inset-0 bg-black/70 z-10" />
             <img 
-              src="/hero-bg.png" 
-              alt="Wheelhouse Tattoo Co. Interior" 
+              src="/hero-banner.png" 
+              alt="Wheelhouse Tattoo Co. Mobile Studio" 
               className="w-full h-full object-cover object-center"
             />
           </div>
@@ -30,8 +35,8 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.2 }}
             >
-              <h2 className="font-mono text-xs md:text-sm uppercase tracking-[0.3em] text-white/70 mb-6">
-                Premium Custom Tattooing
+              <h2 className="font-mono text-xs md:text-sm uppercase tracking-[0.4em] text-primary mb-6 font-bold">
+                The Mobile Tattoo Fleet
               </h2>
             </motion.div>
             
@@ -39,30 +44,39 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.4 }}
-              className="font-serif text-5xl md:text-7xl lg:text-9xl text-white mb-8 leading-[0.9]"
+              className="font-serif text-6xl md:text-8xl lg:text-[10rem] text-white mb-6 leading-[0.85] uppercase tracking-tighter"
             >
-              WHEELHOUSE <br />
-              <span className="text-white/80 italic">TATTOO CO.</span>
+              Ink Meets <br />
+              <span className="text-white/70 italic tracking-normal">The Road.</span>
             </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.5 }}
+              className="max-w-2xl text-lg md:text-xl text-muted-foreground font-sans mt-6"
+            >
+              Operating across TN, TX, AZ, OK, and FL. We bring a full-scale, premium tattoo studio directly to your festival, wedding, or brand activation.
+            </motion.p>
             
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-6 mt-8"
+              className="flex flex-col sm:flex-row gap-6 mt-12"
             >
               <a 
-                href="#booking" 
-                className="font-mono text-sm uppercase tracking-widest bg-white text-black px-8 py-4 hover:bg-white/90 transition-colors flex items-center justify-center gap-2 group"
+                href="/customer/" 
+                className="font-mono text-sm uppercase tracking-widest bg-primary text-primary-foreground px-10 py-5 hover:bg-primary/90 transition-colors flex items-center justify-center gap-3 font-bold"
               >
-                Book a Consultation
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                Book The Fleet
+                <ArrowRight className="w-5 h-5" />
               </a>
               <a 
-                href="#work" 
-                className="font-mono text-sm uppercase tracking-widest border border-white/20 text-white px-8 py-4 hover:bg-white/10 transition-colors flex items-center justify-center"
+                href="#tour" 
+                className="font-mono text-sm uppercase tracking-widest border border-white/20 text-white px-10 py-5 hover:bg-white/10 transition-colors flex items-center justify-center"
               >
-                View Gallery
+                View Tour Dates
               </a>
             </motion.div>
           </div>
@@ -78,14 +92,14 @@ export default function Home() {
               <motion.div 
                 animate={{ y: [0, 48] }} 
                 transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                className="absolute top-0 left-0 w-full h-1/2 bg-white" 
+                className="absolute top-0 left-0 w-full h-1/2 bg-primary" 
               />
             </div>
           </motion.div>
         </section>
 
-        {/* About Section */}
-        <section id="about" className="py-32 md:py-48 bg-background relative z-10">
+        {/* 2. Manifesto Section */}
+        <section id="manifesto" className="py-32 md:py-48 bg-background relative z-10 overflow-hidden">
           <div className="container mx-auto px-6 md:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
               <motion.div 
@@ -95,10 +109,10 @@ export default function Home() {
                 transition={{ duration: 0.8 }}
                 className="relative"
               >
-                <div className="aspect-[3/4] relative z-10 border border-border bg-card p-2">
-                  <img src="/flash-1.png" alt="Tattoo Flash" className="w-full h-full object-cover grayscale-[0.5] contrast-125" />
+                <div className="aspect-[4/5] relative z-10 border border-border bg-card p-2">
+                  <img src="/rig-exterior.png" alt="Tattoo Rig Exterior" className="w-full h-full object-cover grayscale-[0.3] contrast-125" />
                 </div>
-                <div className="absolute top-8 -right-8 bottom-8 -left-8 border border-white/10 z-0 hidden md:block" />
+                <div className="absolute top-12 -right-12 bottom-12 -left-12 border border-primary/20 z-0 hidden md:block" />
               </motion.div>
               
               <motion.div
@@ -107,291 +121,293 @@ export default function Home() {
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
-                <h2 className="font-serif text-4xl md:text-6xl mb-8 leading-tight">
-                  NOT JUST <span className="italic text-muted-foreground">INK.</span><br />
-                  A SACRED <span className="italic text-muted-foreground">CRAFT.</span>
+                <h3 className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-6">The Manifesto</h3>
+                <h2 className="font-serif text-5xl md:text-7xl mb-8 leading-tight uppercase">
+                  Not a shop. <br />
+                  <span className="italic text-muted-foreground tracking-normal">An Experience.</span>
                 </h2>
                 <div className="space-y-6 font-sans text-lg text-muted-foreground leading-relaxed">
                   <p>
-                    Wheelhouse Tattoo Co. is an underground sanctuary for serious collectors and first-timers alike. We don't do flash off the rack, and we don't rush the process.
+                    The tattoo industry has been static for decades. You go to a shop, you wait in a lobby, you get tattooed. We decided to rip the studio out of the strip mall and put it on wheels.
                   </p>
                   <p>
-                    Part art gallery, part master craftsman's workshop, our studio is designed to give you space to breathe, think, and collaborate. We believe what you put on your body should be treated with reverence.
+                    Wheelhouse Tattoo Co. is a fleet of custom-built Airstreams and mobile rigs engineered to be premium, sterile, high-end tattoo environments. We deploy to music festivals, bachelorette weekends, corporate brand activations, and private events.
+                  </p>
+                  <p>
+                    Wherever the energy is, we bring the ink.
                   </p>
                 </div>
-                <div className="mt-12 flex items-center gap-6">
-                  <div className="h-[1px] w-16 bg-white/30"></div>
-                  <span className="font-mono text-sm uppercase tracking-widest text-white">Est. 2018</span>
+                <div className="mt-12 grid grid-cols-2 gap-8 border-t border-border pt-8">
+                  <div>
+                    <Truck className="w-8 h-8 text-primary mb-4" />
+                    <h4 className="font-serif text-2xl text-white mb-2">3 Rigs</h4>
+                    <p className="font-sans text-sm text-muted-foreground">Custom-built mobile studios ready to deploy.</p>
+                  </div>
+                  <div>
+                    <MapPin className="w-8 h-8 text-primary mb-4" />
+                    <h4 className="font-serif text-2xl text-white mb-2">5 States</h4>
+                    <p className="font-sans text-sm text-muted-foreground">Operating across TN, TX, AZ, OK, and FL.</p>
+                  </div>
                 </div>
               </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Artists Section */}
-        <section id="artists" className="py-32 bg-black border-y border-border">
+        {/* 3. The Setup / Standards */}
+        <section className="py-24 bg-card border-y border-border overflow-hidden">
+          <div className="container mx-auto px-6 md:px-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <Shield className="w-12 h-12 text-primary mx-auto mb-6" />
+                <h3 className="font-serif text-2xl text-white mb-4 uppercase">Hospital Grade</h3>
+                <p className="font-sans text-muted-foreground">Every rig meets or exceeds health department standards. Autoclaves, single-use setups, and pristine environments.</p>
+              </motion.div>
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <Zap className="w-12 h-12 text-primary mx-auto mb-6" />
+                <h3 className="font-serif text-2xl text-white mb-4 uppercase">Self-Sufficient</h3>
+                <p className="font-sans text-muted-foreground">Solar panels, generator backups, and onboard water. We don't need your power or plumbing to operate.</p>
+              </motion.div>
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <Droplet className="w-12 h-12 text-primary mx-auto mb-6" />
+                <h3 className="font-serif text-2xl text-white mb-4 uppercase">Elite Artists</h3>
+                <p className="font-sans text-muted-foreground">We curate top-tier talent for every activation. Clean lines, heavy blackwork, and perfect saturation.</p>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. Packages Section */}
+        <section id="packages" className="py-32 md:py-48 bg-background relative">
           <div className="container mx-auto px-6 md:px-12">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8"
+              className="text-center mb-20"
             >
-              <div>
-                <h3 className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">The Masters</h3>
-                <h2 className="font-serif text-5xl md:text-6xl text-white">RESIDENT <br/><span className="italic">ARTISTS</span></h2>
-              </div>
-              <p className="max-w-md font-sans text-muted-foreground text-lg">
-                Our artists specialize in diverse disciplines, from fine-line minimalism to heavy blackwork. Each brings a distinct voice to the studio.
-              </p>
+              <h3 className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-4">How It Works</h3>
+              <h2 className="font-serif text-5xl md:text-6xl text-white uppercase">Deploy The Fleet</h2>
+              <p className="font-sans text-muted-foreground text-lg max-w-2xl mx-auto mt-6">From massive music festivals to intimate private parties, we scale to match the energy of your event.</p>
             </motion.div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
-              {[
-                { name: "Elias Vance", style: "Heavy Blackwork & Traditional", img: "/artist-1.png", waitlist: "Books closed" },
-                { name: "Sarah Chen", style: "Fine-line & Botanical", img: "/artist-2.png", waitlist: "Booking for Oct" }
-              ].map((artist, idx) => (
-                <motion.div 
-                  key={artist.name}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: idx * 0.2 }}
-                  className="group cursor-pointer"
-                >
-                  <div className="aspect-[4/5] relative overflow-hidden mb-6 border border-border">
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
-                    <img 
-                      src={artist.img} 
-                      alt={artist.name} 
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-serif text-2xl text-white mb-2 group-hover:text-white/80 transition-colors">{artist.name}</h3>
-                      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">{artist.style}</p>
-                    </div>
-                    <span className="font-mono text-[10px] uppercase tracking-widest px-3 py-1 border border-border text-muted-foreground">
-                      {artist.waitlist}
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
 
-        {/* Gallery / Work Section */}
-        <section id="work" className="py-32 md:py-48 bg-background">
-          <div className="container mx-auto px-6 md:px-12">
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-24"
-            >
-              <h2 className="font-serif text-5xl md:text-6xl text-white mb-6">RECENT <span className="italic text-muted-foreground">WORK</span></h2>
-              <p className="font-sans text-muted-foreground text-lg max-w-2xl mx-auto">
-                A selection of recent pieces from the studio. We focus on contrast, longevity, and placement.
-              </p>
-            </motion.div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="aspect-square relative overflow-hidden border border-border"
-              >
-                <img src="/work-1.png" alt="Blackwork Tattoo" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
-              </motion.div>
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="aspect-square relative overflow-hidden border border-border md:mt-24"
-              >
-                <img src="/work-2.png" alt="Fine Line Tattoo" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
-              </motion.div>
-            </div>
-            
-            <div className="mt-24 text-center">
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
-                rel="noreferrer"
-                className="inline-flex font-mono text-sm uppercase tracking-widest border-b border-white pb-2 hover:text-muted-foreground hover:border-muted-foreground transition-colors items-center gap-2"
-              >
-                View full gallery on Instagram <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* Process Section */}
-        <section id="process" className="py-32 bg-card border-y border-border">
-          <div className="container mx-auto px-6 md:px-12">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
-              <div className="lg:col-span-1">
-                <motion.h2 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  className="font-serif text-4xl md:text-5xl text-white mb-6"
-                >
-                  THE <br/><span className="italic text-muted-foreground">PROCESS</span>
-                </motion.h2>
-                <motion.p 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.1 }}
-                  className="font-sans text-muted-foreground"
-                >
-                  We don't do factory-line tattooing. Every piece is a collaboration, built to last a lifetime.
-                </motion.p>
+            {packagesLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-96 bg-border/50 animate-pulse border border-border"></div>
+                ))}
               </div>
-              
-              <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-12">
-                {[
-                  { step: "01", title: "Consultation", desc: "We sit down, review your references, and discuss scale, placement, and flow." },
-                  { step: "02", title: "Design", desc: "Your artist creates a custom piece tailored to your anatomy, ensuring it ages beautifully." },
-                  { step: "03", title: "Session", desc: "Step into our focused, calm environment. We prioritize your comfort and the craft." },
-                  { step: "04", title: "Aftercare", desc: "We provide premium aftercare products and detailed instructions to protect your investment." }
-                ].map((item, idx) => (
-                  <motion.div 
-                    key={item.step}
-                    initial={{ opacity: 0, y: 30 }}
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+                {packages.map((pkg, idx) => (
+                  <motion.div
+                    key={pkg.id}
+                    initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.2 + (idx * 0.1) }}
-                    className="border-l border-border pl-6"
+                    transition={{ duration: 0.8, delay: idx * 0.2 }}
+                    className="border border-border bg-card/30 p-8 hover:border-primary transition-colors flex flex-col h-full relative overflow-hidden group"
                   >
-                    <span className="font-mono text-xs text-muted-foreground mb-4 block">{item.step}</span>
-                    <h3 className="font-serif text-2xl text-white mb-3">{item.title}</h3>
-                    <p className="font-sans text-muted-foreground">{item.desc}</p>
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <Truck className="w-24 h-24 text-white" />
+                    </div>
+                    <div className="mb-8 relative z-10">
+                      <span className="font-mono text-sm uppercase tracking-widest text-primary border border-primary/30 px-3 py-1 mb-6 inline-block">
+                        Package {pkg.id}
+                      </span>
+                      <h3 className="font-serif text-3xl text-white mb-4 uppercase">{pkg.name}</h3>
+                      <p className="font-sans text-muted-foreground h-20">{pkg.description}</p>
+                    </div>
+
+                    <div className="space-y-4 mb-10 flex-grow relative z-10">
+                      <div className="flex items-center gap-3">
+                        <Truck className="w-5 h-5 text-primary" />
+                        <span className="font-sans text-white text-sm">{pkg.rigCount} {pkg.rigCount === 1 ? 'Rig' : 'Rigs'} Deployed</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Users className="w-5 h-5 text-primary" />
+                        <span className="font-sans text-white text-sm">Up to {pkg.artistSlots} Artists</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Sparkles className="w-5 h-5 text-primary" />
+                        <span className="font-sans text-white text-sm">Ideal for: {pkg.idealFor.join(", ")}</span>
+                      </div>
+                    </div>
+
+                    {pkg.priceNote && (
+                      <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-6 text-center border-t border-border pt-6 relative z-10">
+                        {pkg.priceNote}
+                      </p>
+                    )}
+
+                    <a 
+                      href={`/customer/?package=${pkg.id}`}
+                      className="font-mono text-sm uppercase tracking-widest border border-primary text-primary px-8 py-4 text-center hover:bg-primary hover:text-primary-foreground transition-colors w-full mt-auto block relative z-10 font-bold"
+                    >
+                      Inquire Now
+                    </a>
                   </motion.div>
                 ))}
               </div>
-            </div>
+            )}
           </div>
         </section>
 
-        {/* Booking Section */}
-        <section id="booking" className="py-32 md:py-48 bg-background">
-          <div className="container mx-auto px-6 md:px-12 max-w-4xl text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1 }}
-            >
-              <h2 className="font-serif text-5xl md:text-7xl text-white mb-8">
-                READY TO <span className="italic text-muted-foreground">COMMIT?</span>
-              </h2>
-              <p className="font-sans text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
-                Fill out our booking request form with your ideas, placement, and preferred artist. We'll review your request and get back to you within 3-5 days.
-              </p>
-              
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-2xl mx-auto mb-12">
-                <div className="space-y-2">
-                  <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground ml-2">Name</label>
-                  <input type="text" className="w-full bg-transparent border border-border p-4 text-white focus:outline-none focus:border-white transition-colors font-sans" placeholder="John Doe" />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground ml-2">Email</label>
-                  <input type="email" className="w-full bg-transparent border border-border p-4 text-white focus:outline-none focus:border-white transition-colors font-sans" placeholder="john@example.com" />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground ml-2">Artist Preference</label>
-                  <select className="w-full bg-transparent border border-border p-4 text-white focus:outline-none focus:border-white transition-colors font-sans appearance-none rounded-none">
-                    <option className="bg-black">No Preference</option>
-                    <option className="bg-black">Elias Vance</option>
-                    <option className="bg-black">Sarah Chen</option>
-                  </select>
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground ml-2">Idea & Placement</label>
-                  <textarea rows={4} className="w-full bg-transparent border border-border p-4 text-white focus:outline-none focus:border-white transition-colors font-sans resize-none" placeholder="Describe what you want to get and where..."></textarea>
-                </div>
-                
-                <div className="md:col-span-2 mt-4 text-center">
-                  <button type="button" className="font-mono text-sm uppercase tracking-widest bg-white text-black px-12 py-4 hover:bg-white/90 transition-colors w-full sm:w-auto">
-                    Submit Request
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Location Section */}
-        <section id="location" className="py-32 bg-black border-t border-border">
+        {/* 5. Gallery / Vibe Section */}
+        <section className="py-32 bg-black border-y border-border">
           <div className="container mx-auto px-6 md:px-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="order-2 lg:order-1"
-              >
-                <h2 className="font-serif text-4xl md:text-5xl text-white mb-12">
-                  FIND <span className="italic text-muted-foreground">US</span>
-                </h2>
-                
-                <div className="space-y-8 font-sans">
-                  <div className="flex items-start gap-4">
-                    <MapPin className="w-6 h-6 text-white shrink-0 mt-1" />
-                    <div>
-                      <h4 className="text-white font-serif text-xl mb-1">The Studio</h4>
-                      <p className="text-muted-foreground">
-                        1248 Underground Alley<br />
-                        Arts District, NY 10012
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <Clock className="w-6 h-6 text-white shrink-0 mt-1" />
-                    <div>
-                      <h4 className="text-white font-serif text-xl mb-1">Hours</h4>
-                      <p className="text-muted-foreground">
-                        Tuesday - Saturday: 12PM - 8PM<br />
-                        Sunday - Monday: Closed
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <Mail className="w-6 h-6 text-white shrink-0 mt-1" />
-                    <div>
-                      <h4 className="text-white font-serif text-xl mb-1">Contact</h4>
-                      <p className="text-muted-foreground">
-                        booking@wheelhousetattooco.com<br />
-                        +1 (555) 019-8472
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-              
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 1 }}
-                className="order-1 lg:order-2 aspect-[4/3] border border-border p-2 bg-card relative"
+                transition={{ duration: 0.8 }}
+                className="aspect-square relative overflow-hidden border border-border"
               >
-                <img src="/exterior.png" alt="Studio Exterior" className="w-full h-full object-cover grayscale-[0.8]" />
+                <img src="/artist-portrait.png" alt="Artist at Work" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0" />
+                <div className="absolute inset-0 bg-black/20 pointer-events-none" />
               </motion.div>
+              <div className="flex flex-col gap-8">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="aspect-video relative overflow-hidden border border-border"
+                >
+                  <img src="/event-atmosphere.png" alt="Event Atmosphere" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000" />
+                </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                  className="aspect-video relative overflow-hidden border border-border bg-card p-12 flex flex-col justify-center"
+                >
+                  <h3 className="font-serif text-3xl text-white mb-4 uppercase">Zero Compromise</h3>
+                  <p className="font-sans text-muted-foreground">Every session in the rig feels identical to walking into a high-end private studio. The music, the lighting, the cleanliness. You forget you're standing in the middle of a 40,000 person festival.</p>
+                </motion.div>
+              </div>
             </div>
+          </div>
+        </section>
+
+        {/* 6. Tour / Events Section */}
+        <section id="tour" className="py-32 bg-card relative overflow-hidden">
+          <div className="container mx-auto px-6 md:px-12 relative z-10">
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8"
+            >
+              <div>
+                <h3 className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-4">Where We're At</h3>
+                <h2 className="font-serif text-5xl md:text-6xl text-white uppercase">Upcoming <br/><span className="italic tracking-normal text-muted-foreground">Tour Dates</span></h2>
+              </div>
+              <p className="max-w-md font-sans text-muted-foreground text-lg">
+                Catch the fleet at a public event near you. Walk-ups welcome, or pre-book a slot to guarantee your spot.
+              </p>
+            </motion.div>
+
+            {eventsLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-24 bg-border/30 animate-pulse border border-border"></div>
+                ))}
+              </div>
+            ) : events.length === 0 ? (
+              <div className="border border-border p-12 text-center bg-background">
+                <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                <h3 className="font-serif text-2xl text-white mb-2 uppercase">No Public Events Scheduled</h3>
+                <p className="font-sans text-muted-foreground mb-6">The fleet is currently booked for private events. Check back soon.</p>
+                <a href="/customer/" className="font-mono text-sm uppercase tracking-widest text-primary hover:text-white transition-colors underline underline-offset-4">
+                  Book us for your own event
+                </a>
+              </div>
+            ) : (
+              <div className="flex flex-col border border-border bg-background">
+                {events.map((event, idx) => (
+                  <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                    className={`flex flex-col md:flex-row md:items-center justify-between p-6 md:p-8 hover:bg-card transition-colors ${
+                      idx !== events.length - 1 ? 'border-b border-border' : ''
+                    }`}
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-12 mb-6 md:mb-0">
+                      <div className="min-w-32 border-l-2 border-primary pl-4">
+                        <span className="font-mono text-xl text-white block">{format(new Date(event.eventDate), 'MMM dd')}</span>
+                        <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">{format(new Date(event.eventDate), 'yyyy')}</span>
+                      </div>
+                      <div>
+                        <h4 className="font-serif text-2xl text-white mb-2 uppercase">{event.title}</h4>
+                        <div className="flex items-center gap-4 text-sm font-sans text-muted-foreground">
+                          <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {event.city}, {event.state}</span>
+                          {event.venue && <span className="hidden md:inline">• {event.venue}</span>}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                      <div className="text-left md:text-right">
+                        <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground block mb-1">Status</span>
+                        <span className={`font-mono text-sm uppercase tracking-widest ${event.status === 'open' ? 'text-green-500' : 'text-primary'}`}>
+                          {event.status}
+                        </span>
+                      </div>
+                      <button className="font-mono text-xs uppercase tracking-widest border border-border px-6 py-3 hover:bg-white hover:text-black transition-colors w-full md:w-auto">
+                        View Details
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* 7. Call to Artists */}
+        <section className="py-32 md:py-48 bg-primary relative overflow-hidden border-t border-border">
+          <div className="absolute inset-0 mix-blend-overlay opacity-20">
+            <img src="/artist-portrait.png" alt="Tattoo Artist" className="w-full h-full object-cover grayscale" />
+          </div>
+          
+          <div className="container mx-auto px-6 md:px-12 relative z-10 text-center max-w-4xl">
+            <Crosshair className="w-16 h-16 text-white mx-auto mb-8 opacity-80" />
+            <h2 className="font-serif text-5xl md:text-7xl text-white mb-6 uppercase">
+              Join The Fleet
+            </h2>
+            <p className="font-sans text-xl text-white/90 mb-12">
+              We're always looking for top-tier guest artists to join us on the road. If you produce exceptional work and want to tattoo at major festivals and private events, apply to our roster.
+            </p>
+            <a 
+              href="/artist/" 
+              className="inline-flex font-mono text-sm uppercase tracking-widest bg-black text-white px-12 py-5 hover:bg-white hover:text-black transition-colors items-center gap-3 font-bold"
+            >
+              Apply as Guest Artist
+              <ArrowRight className="w-4 h-4" />
+            </a>
           </div>
         </section>
       </main>

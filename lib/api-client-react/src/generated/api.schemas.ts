@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Api
  * Wheelhouse Tattoo Platform API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 export interface HealthStatus {
   status: string;
@@ -11,6 +11,24 @@ export interface HealthStatus {
 
 export interface ErrorResponse {
   error: string;
+}
+
+export type PackageId = (typeof PackageId)[keyof typeof PackageId];
+
+export const PackageId = {
+  A: "A",
+  B: "B",
+  C: "C",
+} as const;
+
+export interface Package {
+  id: PackageId;
+  name: string;
+  description: string;
+  rigCount: number;
+  artistSlots: number;
+  idealFor: string[];
+  priceNote?: string;
 }
 
 export interface Artist {
@@ -26,13 +44,12 @@ export interface Artist {
   city: string;
   styles: string[];
   portfolioImages: string[];
-  /** @nullable */
-  hourlyRate?: number | null;
   available: boolean;
   /** @nullable */
   instagramHandle?: string | null;
   /** @nullable */
   yearsExperience?: number | null;
+  approved: boolean;
   createdAt: string;
 }
 
@@ -44,161 +61,296 @@ export interface UpsertArtistBody {
   city: string;
   styles: string[];
   portfolioImages?: string[];
-  hourlyRate?: number;
   available: boolean;
   instagramHandle?: string;
   yearsExperience?: number;
 }
 
-export interface Service {
-  id: number;
-  artistId: number;
-  name: string;
-  /** @nullable */
-  description?: string | null;
-  price: number;
-  durationMinutes: number;
-  category: string;
-  createdAt: string;
+export interface AdminUpdateArtistBody {
+  approved?: boolean;
+  available?: boolean;
 }
 
-export interface CreateServiceBody {
-  name: string;
-  description?: string;
-  price: number;
-  durationMinutes: number;
-  category: string;
-}
+export type EventPackageType =
+  (typeof EventPackageType)[keyof typeof EventPackageType];
 
-export interface UpdateServiceBody {
-  name?: string;
-  description?: string;
-  price?: number;
-  durationMinutes?: number;
-  category?: string;
-}
+export const EventPackageType = {
+  A: "A",
+  B: "B",
+  C: "C",
+} as const;
 
-export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus];
+export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus];
 
-export const BookingStatus = {
-  pending: "pending",
-  confirmed: "confirmed",
+export const EventStatus = {
+  open: "open",
+  full: "full",
   completed: "completed",
   cancelled: "cancelled",
 } as const;
 
-export interface Booking {
+export interface Event {
   id: number;
-  customerId: number;
-  artistId: number;
+  title: string;
   /** @nullable */
-  serviceId?: number | null;
-  status: BookingStatus;
+  description?: string | null;
+  state: string;
+  city: string;
   /** @nullable */
-  scheduledAt?: string | null;
+  venue?: string | null;
+  packageType: EventPackageType;
+  eventDate: string;
+  artistSlots: number;
+  signedUpCount: number;
+  status: EventStatus;
   /** @nullable */
   notes?: string | null;
-  /** @nullable */
-  totalPrice?: number | null;
-  /** @nullable */
-  customerName?: string | null;
+  createdAt: string;
+}
+
+export type CreateEventBodyPackageType =
+  (typeof CreateEventBodyPackageType)[keyof typeof CreateEventBodyPackageType];
+
+export const CreateEventBodyPackageType = {
+  A: "A",
+  B: "B",
+  C: "C",
+} as const;
+
+export interface CreateEventBody {
+  title: string;
+  description?: string;
+  state: string;
+  city: string;
+  venue?: string;
+  packageType: CreateEventBodyPackageType;
+  eventDate: string;
+  artistSlots: number;
+  notes?: string;
+}
+
+export interface ArtistEventSignup {
+  id: number;
+  artistId: number;
+  eventId: number;
   /** @nullable */
   artistName?: string | null;
   /** @nullable */
-  serviceName?: string | null;
-  createdAt: string;
+  artistState?: string | null;
+  artistStyles: string[];
+  /** @nullable */
+  artistInstagram?: string | null;
+  /** @nullable */
+  eventTitle?: string | null;
+  /** @nullable */
+  eventDate?: string | null;
+  /** @nullable */
+  eventState?: string | null;
+  /** @nullable */
+  eventCity?: string | null;
+  /** @nullable */
+  eventPackageType?: string | null;
+  signedUpAt: string;
 }
 
-export interface CreateBookingBody {
-  artistId: number;
-  serviceId?: number;
-  scheduledAt?: string;
-  notes?: string;
-  totalPrice?: number;
-}
+export type InquiryPackageType =
+  (typeof InquiryPackageType)[keyof typeof InquiryPackageType];
 
-export type UpdateBookingStatusBodyStatus =
-  (typeof UpdateBookingStatusBodyStatus)[keyof typeof UpdateBookingStatusBodyStatus];
-
-export const UpdateBookingStatusBodyStatus = {
-  confirmed: "confirmed",
-  completed: "completed",
-  cancelled: "cancelled",
+export const InquiryPackageType = {
+  A: "A",
+  B: "B",
+  C: "C",
 } as const;
 
-export interface UpdateBookingStatusBody {
-  status: UpdateBookingStatusBodyStatus;
-}
+export type InquiryStatus = (typeof InquiryStatus)[keyof typeof InquiryStatus];
 
-export interface Customer {
+export const InquiryStatus = {
+  new: "new",
+  contacted: "contacted",
+  quoted: "quoted",
+  booked: "booked",
+  declined: "declined",
+} as const;
+
+export interface Inquiry {
   id: number;
-  clerkId: string;
-  name: string;
-  email: string;
+  contactName: string;
+  contactEmail: string;
   /** @nullable */
-  phone?: string | null;
+  contactPhone?: string | null;
+  /** @nullable */
+  eventName?: string | null;
+  /** @nullable */
+  eventDate?: string | null;
+  eventState: string;
+  eventCity: string;
+  /** @nullable */
+  expectedAttendees?: number | null;
+  packageType: InquiryPackageType;
+  /** @nullable */
+  message?: string | null;
+  status: InquiryStatus;
+  /** @nullable */
+  adminNotes?: string | null;
   createdAt: string;
 }
 
-export interface UpsertCustomerBody {
+export type CreateInquiryBodyPackageType =
+  (typeof CreateInquiryBodyPackageType)[keyof typeof CreateInquiryBodyPackageType];
+
+export const CreateInquiryBodyPackageType = {
+  A: "A",
+  B: "B",
+  C: "C",
+} as const;
+
+export interface CreateInquiryBody {
+  contactName: string;
+  contactEmail: string;
+  contactPhone?: string;
+  eventName?: string;
+  eventDate?: string;
+  eventState: string;
+  eventCity: string;
+  expectedAttendees?: number;
+  packageType: CreateInquiryBodyPackageType;
+  message?: string;
+}
+
+export type UpdateInquiryStatusBodyStatus =
+  (typeof UpdateInquiryStatusBodyStatus)[keyof typeof UpdateInquiryStatusBodyStatus];
+
+export const UpdateInquiryStatusBodyStatus = {
+  new: "new",
+  contacted: "contacted",
+  quoted: "quoted",
+  booked: "booked",
+  declined: "declined",
+} as const;
+
+export interface UpdateInquiryStatusBody {
+  status: UpdateInquiryStatusBodyStatus;
+  adminNotes?: string;
+}
+
+export type RigStatus = (typeof RigStatus)[keyof typeof RigStatus];
+
+export const RigStatus = {
+  available: "available",
+  deployed: "deployed",
+  maintenance: "maintenance",
+} as const;
+
+export interface Rig {
+  id: number;
   name: string;
-  phone?: string;
+  /** @nullable */
+  description?: string | null;
+  status: RigStatus;
+  /** @nullable */
+  currentEventId?: number | null;
+  /** @nullable */
+  currentEventTitle?: string | null;
+  homeState: string;
+  createdAt: string;
 }
 
-export interface StateLocation {
-  state: string;
-  cities: string[];
-  artistCount: number;
+export type CreateRigBodyStatus =
+  (typeof CreateRigBodyStatus)[keyof typeof CreateRigBodyStatus];
+
+export const CreateRigBodyStatus = {
+  available: "available",
+  deployed: "deployed",
+  maintenance: "maintenance",
+} as const;
+
+export interface CreateRigBody {
+  name: string;
+  description?: string;
+  status?: CreateRigBodyStatus;
+  currentEventId?: number;
+  homeState: string;
 }
 
-export interface LocationSummary {
-  locations: StateLocation[];
+export interface AdminDashboard {
+  totalArtists: number;
+  pendingApprovals: number;
+  totalInquiries: number;
+  newInquiries: number;
+  upcomingEvents: number;
+  openEvents: number;
+  rigsAvailable: number;
+  rigsDeployed: number;
+  recentInquiries: Inquiry[];
+  upcomingEventsList: Event[];
 }
 
-export interface ArtistDashboard {
-  totalBookings: number;
-  pendingBookings: number;
-  confirmedBookings: number;
-  completedBookings: number;
-  totalRevenue: number;
-  recentBookings: Booking[];
-}
-
-export interface CustomerDashboard {
-  totalBookings: number;
-  upcomingBookings: number;
-  completedBookings: number;
-  recentBookings: Booking[];
-}
-
-export type ListArtistsParams = {
-  /**
-   * Filter by US state (e.g. "TX")
-   */
-  state?: string;
-  /**
-   * Filter by city
-   */
-  city?: string;
-  /**
-   * Filter by tattoo style
-   */
-  style?: string;
-};
-
-export type ListBookingsParams = {
+export type ListInquiriesParams = {
   /**
    * Filter by status
    */
-  status?: ListBookingsStatus;
+  status?: ListInquiriesStatus;
+  /**
+   * Filter by state
+   */
+  state?: string;
+  /**
+   * Filter by package type
+   */
+  packageType?: ListInquiriesPackageType;
 };
 
-export type ListBookingsStatus =
-  (typeof ListBookingsStatus)[keyof typeof ListBookingsStatus];
+export type ListInquiriesStatus =
+  (typeof ListInquiriesStatus)[keyof typeof ListInquiriesStatus];
 
-export const ListBookingsStatus = {
-  pending: "pending",
-  confirmed: "confirmed",
-  completed: "completed",
-  cancelled: "cancelled",
+export const ListInquiriesStatus = {
+  new: "new",
+  contacted: "contacted",
+  quoted: "quoted",
+  booked: "booked",
+  declined: "declined",
 } as const;
+
+export type ListInquiriesPackageType =
+  (typeof ListInquiriesPackageType)[keyof typeof ListInquiriesPackageType];
+
+export const ListInquiriesPackageType = {
+  A: "A",
+  B: "B",
+  C: "C",
+} as const;
+
+export type ListEventsParams = {
+  /**
+   * Filter by state
+   */
+  state?: string;
+  /**
+   * Only return upcoming events
+   */
+  upcoming?: boolean;
+  /**
+   * Filter by package type
+   */
+  packageType?: ListEventsPackageType;
+};
+
+export type ListEventsPackageType =
+  (typeof ListEventsPackageType)[keyof typeof ListEventsPackageType];
+
+export const ListEventsPackageType = {
+  A: "A",
+  B: "B",
+  C: "C",
+} as const;
+
+export type AdminListArtistsParams = {
+  /**
+   * Filter by state
+   */
+  state?: string;
+  /**
+   * Filter by availability
+   */
+  available?: boolean;
+};

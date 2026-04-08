@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { artistsTable } from "@workspace/db";
-import { eq, and, arrayContains, sql } from "drizzle-orm";
+import { artistsTable, artistEventSignupsTable, eventsTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
 import { requireAuth } from "./auth";
 import { UpsertMyArtistProfileBody } from "@workspace/api-zod";
+import { getAuth } from "@clerk/express";
 
 const router = Router();
 
@@ -19,8 +20,8 @@ function formatArtist(a: typeof artistsTable.$inferSelect) {
     city: a.city,
     styles: a.styles ?? [],
     portfolioImages: a.portfolioImages ?? [],
-    hourlyRate: a.hourlyRate ? Number(a.hourlyRate) : null,
     available: a.available,
+    approved: a.approved,
     instagramHandle: a.instagramHandle ?? null,
     yearsExperience: a.yearsExperience ?? null,
     createdAt: a.createdAt.toISOString(),
@@ -77,11 +78,12 @@ router.get("/artists/locations", async (_req, res) => {
 
 router.get("/artists/me", requireAuth, async (req, res) => {
   try {
-    const clerkId = (req as any).clerkUserId;
+    const auth = getAuth(req);
+    const clerkId = auth.userId;
+    if (!clerkId) return res.status(401).json({ error: "Unauthorized" });
     const [artist] = await db.select().from(artistsTable).where(eq(artistsTable.clerkId, clerkId));
     if (!artist) {
-      res.status(404).json({ error: "Artist profile not found" });
-      return;
+      return res.status(404).json({ error: "Artist profile not found" });
     }
     res.json(formatArtist(artist));
   } catch (err) {
@@ -91,11 +93,13 @@ router.get("/artists/me", requireAuth, async (req, res) => {
 
 router.put("/artists/me", requireAuth, async (req, res) => {
   try {
-    const clerkId = (req as any).clerkUserId;
+    const auth = getAuth(req);
+    const clerkId = auth.userId;
+    if (!clerkId) return res.status(401).json({ error: "Unauthorized" });
+
     const parsed = UpsertMyArtistProfileBody.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ error: "Invalid request body" });
-      return;
+      return res.status(400).json({ error: "Invalid request body" });
     }
     const data = parsed.data;
 
@@ -113,7 +117,6 @@ router.put("/artists/me", requireAuth, async (req, res) => {
           city: data.city,
           styles: data.styles,
           portfolioImages: data.portfolioImages ?? [],
-          hourlyRate: data.hourlyRate?.toString() ?? null,
           available: data.available,
           instagramHandle: data.instagramHandle ?? null,
           yearsExperience: data.yearsExperience ?? null,
@@ -121,8 +124,11 @@ router.put("/artists/me", requireAuth, async (req, res) => {
         .where(eq(artistsTable.clerkId, clerkId))
         .returning();
     } else {
-      const auth = await import("@clerk/express").then((m) => m.getAuth(req as any));
-      const email = req.headers["x-clerk-email"] as string || `${clerkId}@artist.wheelhouse.app`;
+      const clerkUser = await fetch(`https://api.clerk.com/v1/users/${clerkId}`, {
+        headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` },
+      }).then((r) => r.json()).catch(() => null);
+      const email = clerkUser?.email_addresses?.[0]?.email_address ?? `${clerkId}@artist.wheelhouse.app`;
+
       [artist] = await db
         .insert(artistsTable)
         .values({
@@ -135,8 +141,8 @@ router.put("/artists/me", requireAuth, async (req, res) => {
           city: data.city,
           styles: data.styles,
           portfolioImages: data.portfolioImages ?? [],
-          hourlyRate: data.hourlyRate?.toString() ?? null,
           available: data.available,
+          approved: false,
           instagramHandle: data.instagramHandle ?? null,
           yearsExperience: data.yearsExperience ?? null,
         })
@@ -149,18 +155,48 @@ router.put("/artists/me", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/artists/:id", async (req, res) => {
+router.get("/artists/me/events", requireAuth, async (req, res) => {
   try {
-    const id = Number(req.params.id);
-    const [artist] = await db.select().from(artistsTable).where(eq(artistsTable.id, id));
-    if (!artist) {
-      res.status(404).json({ error: "Artist not found" });
-      return;
-    }
-    res.json(formatArtist(artist));
+    const auth = getAuth(req);
+    const clerkId = auth.userId;
+    if (!clerkId) return res.status(401).json({ error: "Unauthorized" });
+
+    const [artist] = await db.select().from(artistsTable).where(eq(artistsTable.clerkId, clerkId));
+    if (!artist) return res.status(404).json({ error: "Artist profile not found" });
+
+    const signups = await db.select({
+      id: artistEventSignupsTable.id,
+      artistId: artistEventSignupsTable.artistId,
+      eventId: artistEventSignupsTable.eventId,
+      signedUpAt: artistEventSignupsTable.signedUpAt,
+      eventTitle: eventsTable.title,
+      eventDate: eventsTable.eventDate,
+      eventState: eventsTable.state,
+      eventCity: eventsTable.city,
+      eventPackageType: eventsTable.packageType,
+    }).from(artistEventSignupsTable)
+      .leftJoin(eventsTable, eq(artistEventSignupsTable.eventId, eventsTable.id))
+      .where(eq(artistEventSignupsTable.artistId, artist.id));
+
+    res.json(signups.map((s) => ({
+      id: s.id,
+      artistId: s.artistId,
+      eventId: s.eventId,
+      artistName: artist.name,
+      artistState: artist.state,
+      artistStyles: artist.styles ?? [],
+      artistInstagram: artist.instagramHandle ?? null,
+      eventTitle: s.eventTitle ?? null,
+      eventDate: s.eventDate?.toISOString() ?? null,
+      eventState: s.eventState ?? null,
+      eventCity: s.eventCity ?? null,
+      eventPackageType: s.eventPackageType ?? null,
+      signedUpAt: s.signedUpAt.toISOString(),
+    })));
   } catch (err) {
-    res.status(500).json({ error: "Failed to get artist" });
+    res.status(500).json({ error: "Failed to get event signups" });
   }
 });
 
+export { formatArtist };
 export default router;

@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, boolean, numeric, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -13,8 +13,8 @@ export const artistsTable = pgTable("artists", {
   city: text("city").notNull(),
   styles: text("styles").array().notNull().default([]),
   portfolioImages: text("portfolio_images").array().notNull().default([]),
-  hourlyRate: numeric("hourly_rate", { precision: 10, scale: 2 }),
   available: boolean("available").notNull().default(true),
+  approved: boolean("approved").notNull().default(false),
   instagramHandle: text("instagram_handle"),
   yearsExperience: integer("years_experience"),
   createdAt: timestamp("created_at").notNull().defaultNow(),

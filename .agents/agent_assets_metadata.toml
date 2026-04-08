@@ -48,3 +48,27 @@ id = "wk73ShojKvOBk7CLPjp-Y"
 uri = "file://artifacts/artist-portal/public/hero-bg.png"
 type = "image"
 title = "Dark tattoo studio hero background"
+
+[[generated]]
+id = "SvuhlFyjweZfQUoRn27as"
+uri = "file://artifacts/wheelhouse-tattoo/public/hero-banner.png"
+type = "image"
+title = "Cinematic hero banner"
+
+[[generated]]
+id = "SV5tA9qduJDVm8UObCACC"
+uri = "file://artifacts/wheelhouse-tattoo/public/rig-exterior.png"
+type = "image"
+title = "Mobile tattoo fleet rig"
+
+[[generated]]
+id = "S71KQxIsQjIceCLBONl-0"
+uri = "file://artifacts/wheelhouse-tattoo/public/artist-portrait.png"
+type = "image"
+title = "Tattoo artist portrait"
+
+[[generated]]
+id = "Msn0_8_Ph7WFCpRN9DrGb"
+uri = "file://artifacts/wheelhouse-tattoo/public/event-atmosphere.png"
+type = "image"
+title = "Event atmosphere crowd"

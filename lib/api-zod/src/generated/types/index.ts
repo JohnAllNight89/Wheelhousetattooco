@@ -3,27 +3,37 @@
  * Do not edit manually.
  * Api
  * Wheelhouse Tattoo Platform API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 
+export * from "./adminDashboard";
+export * from "./adminListArtistsParams";
+export * from "./adminUpdateArtistBody";
 export * from "./artist";
-export * from "./artistDashboard";
-export * from "./booking";
-export * from "./bookingStatus";
-export * from "./createBookingBody";
-export * from "./createServiceBody";
-export * from "./customer";
-export * from "./customerDashboard";
+export * from "./artistEventSignup";
+export * from "./createEventBody";
+export * from "./createEventBodyPackageType";
+export * from "./createInquiryBody";
+export * from "./createInquiryBodyPackageType";
+export * from "./createRigBody";
+export * from "./createRigBodyStatus";
 export * from "./errorResponse";
+export * from "./event";
+export * from "./eventPackageType";
+export * from "./eventStatus";
 export * from "./healthStatus";
-export * from "./listArtistsParams";
-export * from "./listBookingsParams";
-export * from "./listBookingsStatus";
-export * from "./locationSummary";
-export * from "./service";
-export * from "./stateLocation";
-export * from "./updateBookingStatusBody";
-export * from "./updateBookingStatusBodyStatus";
-export * from "./updateServiceBody";
+export * from "./inquiry";
+export * from "./inquiryPackageType";
+export * from "./inquiryStatus";
+export * from "./listEventsPackageType";
+export * from "./listEventsParams";
+export * from "./listInquiriesPackageType";
+export * from "./listInquiriesParams";
+export * from "./listInquiriesStatus";
+export * from "./package";
+export * from "./packageId";
+export * from "./rig";
+export * from "./rigStatus";
+export * from "./updateInquiryStatusBody";
+export * from "./updateInquiryStatusBodyStatus";
 export * from "./upsertArtistBody";
-export * from "./upsertCustomerBody";

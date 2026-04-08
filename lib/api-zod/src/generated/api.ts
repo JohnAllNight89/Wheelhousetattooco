@@ -3,12 +3,11 @@
  * Do not edit manually.
  * Api
  * Wheelhouse Tattoo Platform API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -16,53 +15,275 @@ export const HealthCheckResponse = zod.object({
 });
 
 /**
- * Browse tattoo artists, optionally filtered by state and city
- * @summary List all artists
+ * Returns the three Wheelhouse Tattoo service packages
+ * @summary List all packages
  */
-export const ListArtistsQueryParams = zod.object({
-  state: zod.coerce
-    .string()
-    .optional()
-    .describe('Filter by US state (e.g. \"TX\")'),
-  city: zod.coerce.string().optional().describe("Filter by city"),
-  style: zod.coerce.string().optional().describe("Filter by tattoo style"),
+export const ListPackagesResponseItem = zod.object({
+  id: zod.enum(["A", "B", "C"]),
+  name: zod.string(),
+  description: zod.string(),
+  rigCount: zod.number(),
+  artistSlots: zod.number(),
+  idealFor: zod.array(zod.string()),
+  priceNote: zod.string().optional(),
+});
+export const ListPackagesResponse = zod.array(ListPackagesResponseItem);
+
+/**
+ * Customer submits an event inquiry/booking request
+ * @summary Submit a customer inquiry
+ */
+export const CreateInquiryBody = zod.object({
+  contactName: zod.string(),
+  contactEmail: zod.string(),
+  contactPhone: zod.string().optional(),
+  eventName: zod.string().optional(),
+  eventDate: zod.coerce.date().optional(),
+  eventState: zod.string(),
+  eventCity: zod.string(),
+  expectedAttendees: zod.number().optional(),
+  packageType: zod.enum(["A", "B", "C"]),
+  message: zod.string().optional(),
 });
 
-export const ListArtistsResponseItem = zod.object({
+/**
+ * @summary List all inquiries (admin)
+ */
+export const ListInquiriesQueryParams = zod.object({
+  status: zod
+    .enum(["new", "contacted", "quoted", "booked", "declined"])
+    .optional()
+    .describe("Filter by status"),
+  state: zod.coerce.string().optional().describe("Filter by state"),
+  packageType: zod
+    .enum(["A", "B", "C"])
+    .optional()
+    .describe("Filter by package type"),
+});
+
+export const ListInquiriesResponseItem = zod.object({
   id: zod.number(),
-  clerkId: zod.string(),
-  name: zod.string(),
-  bio: zod.string().nullish(),
-  email: zod.string(),
-  phone: zod.string().nullish(),
-  state: zod.string(),
-  city: zod.string(),
-  styles: zod.array(zod.string()),
-  portfolioImages: zod.array(zod.string()),
-  hourlyRate: zod.number().nullish(),
-  available: zod.boolean(),
-  instagramHandle: zod.string().nullish(),
-  yearsExperience: zod.number().nullish(),
+  contactName: zod.string(),
+  contactEmail: zod.string(),
+  contactPhone: zod.string().nullish(),
+  eventName: zod.string().nullish(),
+  eventDate: zod.coerce.date().nullish(),
+  eventState: zod.string(),
+  eventCity: zod.string(),
+  expectedAttendees: zod.number().nullish(),
+  packageType: zod.enum(["A", "B", "C"]),
+  message: zod.string().nullish(),
+  status: zod.enum(["new", "contacted", "quoted", "booked", "declined"]),
+  adminNotes: zod.string().nullish(),
   createdAt: zod.coerce.date(),
 });
-export const ListArtistsResponse = zod.array(ListArtistsResponseItem);
+export const ListInquiriesResponse = zod.array(ListInquiriesResponseItem);
 
 /**
- * Returns a grouped list of states and cities where artists are located
- * @summary Get all states and cities with artists
+ * @summary Get inquiry details
  */
-export const GetArtistLocationsResponse = zod.object({
-  locations: zod.array(
-    zod.object({
-      state: zod.string(),
-      cities: zod.array(zod.string()),
-      artistCount: zod.number(),
-    }),
-  ),
+export const GetInquiryParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetInquiryResponse = zod.object({
+  id: zod.number(),
+  contactName: zod.string(),
+  contactEmail: zod.string(),
+  contactPhone: zod.string().nullish(),
+  eventName: zod.string().nullish(),
+  eventDate: zod.coerce.date().nullish(),
+  eventState: zod.string(),
+  eventCity: zod.string(),
+  expectedAttendees: zod.number().nullish(),
+  packageType: zod.enum(["A", "B", "C"]),
+  message: zod.string().nullish(),
+  status: zod.enum(["new", "contacted", "quoted", "booked", "declined"]),
+  adminNotes: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
 });
 
 /**
- * Get the current authenticated artist's profile
+ * @summary Update inquiry status (admin)
+ */
+export const UpdateInquiryStatusParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateInquiryStatusBody = zod.object({
+  status: zod.enum(["new", "contacted", "quoted", "booked", "declined"]),
+  adminNotes: zod.string().optional(),
+});
+
+export const UpdateInquiryStatusResponse = zod.object({
+  id: zod.number(),
+  contactName: zod.string(),
+  contactEmail: zod.string(),
+  contactPhone: zod.string().nullish(),
+  eventName: zod.string().nullish(),
+  eventDate: zod.coerce.date().nullish(),
+  eventState: zod.string(),
+  eventCity: zod.string(),
+  expectedAttendees: zod.number().nullish(),
+  packageType: zod.enum(["A", "B", "C"]),
+  message: zod.string().nullish(),
+  status: zod.enum(["new", "contacted", "quoted", "booked", "declined"]),
+  adminNotes: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary List events
+ */
+export const ListEventsQueryParams = zod.object({
+  state: zod.coerce.string().optional().describe("Filter by state"),
+  upcoming: zod.coerce
+    .boolean()
+    .optional()
+    .describe("Only return upcoming events"),
+  packageType: zod
+    .enum(["A", "B", "C"])
+    .optional()
+    .describe("Filter by package type"),
+});
+
+export const ListEventsResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string().nullish(),
+  state: zod.string(),
+  city: zod.string(),
+  venue: zod.string().nullish(),
+  packageType: zod.enum(["A", "B", "C"]),
+  eventDate: zod.coerce.date(),
+  artistSlots: zod.number(),
+  signedUpCount: zod.number(),
+  status: zod.enum(["open", "full", "completed", "cancelled"]),
+  notes: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+});
+export const ListEventsResponse = zod.array(ListEventsResponseItem);
+
+/**
+ * @summary Create an event (admin)
+ */
+export const CreateEventBody = zod.object({
+  title: zod.string(),
+  description: zod.string().optional(),
+  state: zod.string(),
+  city: zod.string(),
+  venue: zod.string().optional(),
+  packageType: zod.enum(["A", "B", "C"]),
+  eventDate: zod.coerce.date(),
+  artistSlots: zod.number(),
+  notes: zod.string().optional(),
+});
+
+/**
+ * @summary Get event details
+ */
+export const GetEventParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetEventResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string().nullish(),
+  state: zod.string(),
+  city: zod.string(),
+  venue: zod.string().nullish(),
+  packageType: zod.enum(["A", "B", "C"]),
+  eventDate: zod.coerce.date(),
+  artistSlots: zod.number(),
+  signedUpCount: zod.number(),
+  status: zod.enum(["open", "full", "completed", "cancelled"]),
+  notes: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Update an event (admin)
+ */
+export const UpdateEventParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateEventBody = zod.object({
+  title: zod.string(),
+  description: zod.string().optional(),
+  state: zod.string(),
+  city: zod.string(),
+  venue: zod.string().optional(),
+  packageType: zod.enum(["A", "B", "C"]),
+  eventDate: zod.coerce.date(),
+  artistSlots: zod.number(),
+  notes: zod.string().optional(),
+});
+
+export const UpdateEventResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string().nullish(),
+  state: zod.string(),
+  city: zod.string(),
+  venue: zod.string().nullish(),
+  packageType: zod.enum(["A", "B", "C"]),
+  eventDate: zod.coerce.date(),
+  artistSlots: zod.number(),
+  signedUpCount: zod.number(),
+  status: zod.enum(["open", "full", "completed", "cancelled"]),
+  notes: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Delete an event (admin)
+ */
+export const DeleteEventParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * First come, first served — artist claims an open slot at the event
+ * @summary Artist signs up for an event
+ */
+export const SignUpForEventParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary Artist withdraws from an event
+ */
+export const WithdrawFromEventParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary Get all artist signups for an event (admin)
+ */
+export const GetEventSignupsParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetEventSignupsResponseItem = zod.object({
+  id: zod.number(),
+  artistId: zod.number(),
+  eventId: zod.number(),
+  artistName: zod.string().nullish(),
+  artistState: zod.string().nullish(),
+  artistStyles: zod.array(zod.string()),
+  artistInstagram: zod.string().nullish(),
+  eventTitle: zod.string().nullish(),
+  eventDate: zod.coerce.date().nullish(),
+  eventState: zod.string().nullish(),
+  eventCity: zod.string().nullish(),
+  eventPackageType: zod.string().nullish(),
+  signedUpAt: zod.coerce.date(),
+});
+export const GetEventSignupsResponse = zod.array(GetEventSignupsResponseItem);
+
+/**
  * @summary Get my artist profile
  */
 export const GetMyArtistProfileResponse = zod.object({
@@ -76,15 +297,14 @@ export const GetMyArtistProfileResponse = zod.object({
   city: zod.string(),
   styles: zod.array(zod.string()),
   portfolioImages: zod.array(zod.string()),
-  hourlyRate: zod.number().nullish(),
   available: zod.boolean(),
   instagramHandle: zod.string().nullish(),
   yearsExperience: zod.number().nullish(),
+  approved: zod.boolean(),
   createdAt: zod.coerce.date(),
 });
 
 /**
- * Create or update the current authenticated artist's profile
  * @summary Create or update my artist profile
  */
 export const UpsertMyArtistProfileBody = zod.object({
@@ -95,7 +315,6 @@ export const UpsertMyArtistProfileBody = zod.object({
   city: zod.string(),
   styles: zod.array(zod.string()),
   portfolioImages: zod.array(zod.string()).optional(),
-  hourlyRate: zod.number().optional(),
   available: zod.boolean(),
   instagramHandle: zod.string().optional(),
   yearsExperience: zod.number().optional(),
@@ -112,21 +331,145 @@ export const UpsertMyArtistProfileResponse = zod.object({
   city: zod.string(),
   styles: zod.array(zod.string()),
   portfolioImages: zod.array(zod.string()),
-  hourlyRate: zod.number().nullish(),
   available: zod.boolean(),
   instagramHandle: zod.string().nullish(),
   yearsExperience: zod.number().nullish(),
+  approved: zod.boolean(),
   createdAt: zod.coerce.date(),
 });
 
 /**
- * @summary Get artist by ID
+ * @summary Get events I have signed up for
  */
-export const GetArtistParams = zod.object({
+export const GetMyEventSignupsResponseItem = zod.object({
+  id: zod.number(),
+  artistId: zod.number(),
+  eventId: zod.number(),
+  artistName: zod.string().nullish(),
+  artistState: zod.string().nullish(),
+  artistStyles: zod.array(zod.string()),
+  artistInstagram: zod.string().nullish(),
+  eventTitle: zod.string().nullish(),
+  eventDate: zod.coerce.date().nullish(),
+  eventState: zod.string().nullish(),
+  eventCity: zod.string().nullish(),
+  eventPackageType: zod.string().nullish(),
+  signedUpAt: zod.coerce.date(),
+});
+export const GetMyEventSignupsResponse = zod.array(
+  GetMyEventSignupsResponseItem,
+);
+
+/**
+ * @summary List all rigs (admin)
+ */
+export const ListRigsResponseItem = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string().nullish(),
+  status: zod.enum(["available", "deployed", "maintenance"]),
+  currentEventId: zod.number().nullish(),
+  currentEventTitle: zod.string().nullish(),
+  homeState: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+export const ListRigsResponse = zod.array(ListRigsResponseItem);
+
+/**
+ * @summary Create a rig (admin)
+ */
+export const CreateRigBody = zod.object({
+  name: zod.string(),
+  description: zod.string().optional(),
+  status: zod.enum(["available", "deployed", "maintenance"]).optional(),
+  currentEventId: zod.number().optional(),
+  homeState: zod.string(),
+});
+
+/**
+ * @summary Update a rig (admin)
+ */
+export const UpdateRigParams = zod.object({
   id: zod.coerce.number(),
 });
 
-export const GetArtistResponse = zod.object({
+export const UpdateRigBody = zod.object({
+  name: zod.string(),
+  description: zod.string().optional(),
+  status: zod.enum(["available", "deployed", "maintenance"]).optional(),
+  currentEventId: zod.number().optional(),
+  homeState: zod.string(),
+});
+
+export const UpdateRigResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  description: zod.string().nullish(),
+  status: zod.enum(["available", "deployed", "maintenance"]),
+  currentEventId: zod.number().nullish(),
+  currentEventTitle: zod.string().nullish(),
+  homeState: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Admin dashboard summary
+ */
+export const GetAdminDashboardResponse = zod.object({
+  totalArtists: zod.number(),
+  pendingApprovals: zod.number(),
+  totalInquiries: zod.number(),
+  newInquiries: zod.number(),
+  upcomingEvents: zod.number(),
+  openEvents: zod.number(),
+  rigsAvailable: zod.number(),
+  rigsDeployed: zod.number(),
+  recentInquiries: zod.array(
+    zod.object({
+      id: zod.number(),
+      contactName: zod.string(),
+      contactEmail: zod.string(),
+      contactPhone: zod.string().nullish(),
+      eventName: zod.string().nullish(),
+      eventDate: zod.coerce.date().nullish(),
+      eventState: zod.string(),
+      eventCity: zod.string(),
+      expectedAttendees: zod.number().nullish(),
+      packageType: zod.enum(["A", "B", "C"]),
+      message: zod.string().nullish(),
+      status: zod.enum(["new", "contacted", "quoted", "booked", "declined"]),
+      adminNotes: zod.string().nullish(),
+      createdAt: zod.coerce.date(),
+    }),
+  ),
+  upcomingEventsList: zod.array(
+    zod.object({
+      id: zod.number(),
+      title: zod.string(),
+      description: zod.string().nullish(),
+      state: zod.string(),
+      city: zod.string(),
+      venue: zod.string().nullish(),
+      packageType: zod.enum(["A", "B", "C"]),
+      eventDate: zod.coerce.date(),
+      artistSlots: zod.number(),
+      signedUpCount: zod.number(),
+      status: zod.enum(["open", "full", "completed", "cancelled"]),
+      notes: zod.string().nullish(),
+      createdAt: zod.coerce.date(),
+    }),
+  ),
+});
+
+/**
+ * @summary List all registered artists with availability (admin)
+ */
+export const AdminListArtistsQueryParams = zod.object({
+  state: zod.coerce.string().optional().describe("Filter by state"),
+  available: zod.coerce.boolean().optional().describe("Filter by availability"),
+});
+
+export const AdminListArtistsResponseItem = zod.object({
   id: zod.number(),
   clerkId: zod.string(),
   name: zod.string(),
@@ -137,262 +480,40 @@ export const GetArtistResponse = zod.object({
   city: zod.string(),
   styles: zod.array(zod.string()),
   portfolioImages: zod.array(zod.string()),
-  hourlyRate: zod.number().nullish(),
   available: zod.boolean(),
   instagramHandle: zod.string().nullish(),
   yearsExperience: zod.number().nullish(),
+  approved: zod.boolean(),
   createdAt: zod.coerce.date(),
 });
+export const AdminListArtistsResponse = zod.array(AdminListArtistsResponseItem);
 
 /**
- * @summary Get services for an artist
+ * @summary Update artist status (admin)
  */
-export const GetArtistServicesParams = zod.object({
+export const AdminUpdateArtistParams = zod.object({
   id: zod.coerce.number(),
 });
 
-export const GetArtistServicesResponseItem = zod.object({
-  id: zod.number(),
-  artistId: zod.number(),
-  name: zod.string(),
-  description: zod.string().nullish(),
-  price: zod.number(),
-  durationMinutes: zod.number(),
-  category: zod.string(),
-  createdAt: zod.coerce.date(),
-});
-export const GetArtistServicesResponse = zod.array(
-  GetArtistServicesResponseItem,
-);
-
-/**
- * Artist creates a new service offering
- * @summary Create a service
- */
-export const CreateServiceBody = zod.object({
-  name: zod.string(),
-  description: zod.string().optional(),
-  price: zod.number(),
-  durationMinutes: zod.number(),
-  category: zod.string(),
+export const AdminUpdateArtistBody = zod.object({
+  approved: zod.boolean().optional(),
+  available: zod.boolean().optional(),
 });
 
-/**
- * Artist gets their own services
- * @summary Get my services
- */
-export const GetMyServicesResponseItem = zod.object({
-  id: zod.number(),
-  artistId: zod.number(),
-  name: zod.string(),
-  description: zod.string().nullish(),
-  price: zod.number(),
-  durationMinutes: zod.number(),
-  category: zod.string(),
-  createdAt: zod.coerce.date(),
-});
-export const GetMyServicesResponse = zod.array(GetMyServicesResponseItem);
-
-/**
- * @summary Update a service
- */
-export const UpdateServiceParams = zod.object({
-  id: zod.coerce.number(),
-});
-
-export const UpdateServiceBody = zod.object({
-  name: zod.string().optional(),
-  description: zod.string().optional(),
-  price: zod.number().optional(),
-  durationMinutes: zod.number().optional(),
-  category: zod.string().optional(),
-});
-
-export const UpdateServiceResponse = zod.object({
-  id: zod.number(),
-  artistId: zod.number(),
-  name: zod.string(),
-  description: zod.string().nullish(),
-  price: zod.number(),
-  durationMinutes: zod.number(),
-  category: zod.string(),
-  createdAt: zod.coerce.date(),
-});
-
-/**
- * @summary Delete a service
- */
-export const DeleteServiceParams = zod.object({
-  id: zod.coerce.number(),
-});
-
-/**
- * Returns bookings for the current user (customer sees their bookings, artist sees bookings with them)
- * @summary List bookings
- */
-export const ListBookingsQueryParams = zod.object({
-  status: zod
-    .enum(["pending", "confirmed", "completed", "cancelled"])
-    .optional()
-    .describe("Filter by status"),
-});
-
-export const ListBookingsResponseItem = zod.object({
-  id: zod.number(),
-  customerId: zod.number(),
-  artistId: zod.number(),
-  serviceId: zod.number().nullish(),
-  status: zod.enum(["pending", "confirmed", "completed", "cancelled"]),
-  scheduledAt: zod.coerce.date().nullish(),
-  notes: zod.string().nullish(),
-  totalPrice: zod.number().nullish(),
-  customerName: zod.string().nullish(),
-  artistName: zod.string().nullish(),
-  serviceName: zod.string().nullish(),
-  createdAt: zod.coerce.date(),
-});
-export const ListBookingsResponse = zod.array(ListBookingsResponseItem);
-
-/**
- * Customer books an artist for a service
- * @summary Create a booking
- */
-export const CreateBookingBody = zod.object({
-  artistId: zod.number(),
-  serviceId: zod.number().optional(),
-  scheduledAt: zod.coerce.date().optional(),
-  notes: zod.string().optional(),
-  totalPrice: zod.number().optional(),
-});
-
-/**
- * @summary Get booking details
- */
-export const GetBookingParams = zod.object({
-  id: zod.coerce.number(),
-});
-
-export const GetBookingResponse = zod.object({
-  id: zod.number(),
-  customerId: zod.number(),
-  artistId: zod.number(),
-  serviceId: zod.number().nullish(),
-  status: zod.enum(["pending", "confirmed", "completed", "cancelled"]),
-  scheduledAt: zod.coerce.date().nullish(),
-  notes: zod.string().nullish(),
-  totalPrice: zod.number().nullish(),
-  customerName: zod.string().nullish(),
-  artistName: zod.string().nullish(),
-  serviceName: zod.string().nullish(),
-  createdAt: zod.coerce.date(),
-});
-
-/**
- * Artist confirms, completes, or cancels a booking
- * @summary Update booking status
- */
-export const UpdateBookingStatusParams = zod.object({
-  id: zod.coerce.number(),
-});
-
-export const UpdateBookingStatusBody = zod.object({
-  status: zod.enum(["confirmed", "completed", "cancelled"]),
-});
-
-export const UpdateBookingStatusResponse = zod.object({
-  id: zod.number(),
-  customerId: zod.number(),
-  artistId: zod.number(),
-  serviceId: zod.number().nullish(),
-  status: zod.enum(["pending", "confirmed", "completed", "cancelled"]),
-  scheduledAt: zod.coerce.date().nullish(),
-  notes: zod.string().nullish(),
-  totalPrice: zod.number().nullish(),
-  customerName: zod.string().nullish(),
-  artistName: zod.string().nullish(),
-  serviceName: zod.string().nullish(),
-  createdAt: zod.coerce.date(),
-});
-
-/**
- * @summary Get my customer profile
- */
-export const GetMyCustomerProfileResponse = zod.object({
+export const AdminUpdateArtistResponse = zod.object({
   id: zod.number(),
   clerkId: zod.string(),
   name: zod.string(),
+  bio: zod.string().nullish(),
   email: zod.string(),
   phone: zod.string().nullish(),
+  state: zod.string(),
+  city: zod.string(),
+  styles: zod.array(zod.string()),
+  portfolioImages: zod.array(zod.string()),
+  available: zod.boolean(),
+  instagramHandle: zod.string().nullish(),
+  yearsExperience: zod.number().nullish(),
+  approved: zod.boolean(),
   createdAt: zod.coerce.date(),
-});
-
-/**
- * @summary Create or update my customer profile
- */
-export const UpsertMyCustomerProfileBody = zod.object({
-  name: zod.string(),
-  phone: zod.string().optional(),
-});
-
-export const UpsertMyCustomerProfileResponse = zod.object({
-  id: zod.number(),
-  clerkId: zod.string(),
-  name: zod.string(),
-  email: zod.string(),
-  phone: zod.string().nullish(),
-  createdAt: zod.coerce.date(),
-});
-
-/**
- * Summary stats for the artist's dashboard
- * @summary Get artist dashboard summary
- */
-export const GetArtistDashboardResponse = zod.object({
-  totalBookings: zod.number(),
-  pendingBookings: zod.number(),
-  confirmedBookings: zod.number(),
-  completedBookings: zod.number(),
-  totalRevenue: zod.number(),
-  recentBookings: zod.array(
-    zod.object({
-      id: zod.number(),
-      customerId: zod.number(),
-      artistId: zod.number(),
-      serviceId: zod.number().nullish(),
-      status: zod.enum(["pending", "confirmed", "completed", "cancelled"]),
-      scheduledAt: zod.coerce.date().nullish(),
-      notes: zod.string().nullish(),
-      totalPrice: zod.number().nullish(),
-      customerName: zod.string().nullish(),
-      artistName: zod.string().nullish(),
-      serviceName: zod.string().nullish(),
-      createdAt: zod.coerce.date(),
-    }),
-  ),
-});
-
-/**
- * Summary stats for the customer's dashboard
- * @summary Get customer dashboard summary
- */
-export const GetCustomerDashboardResponse = zod.object({
-  totalBookings: zod.number(),
-  upcomingBookings: zod.number(),
-  completedBookings: zod.number(),
-  recentBookings: zod.array(
-    zod.object({
-      id: zod.number(),
-      customerId: zod.number(),
-      artistId: zod.number(),
-      serviceId: zod.number().nullish(),
-      status: zod.enum(["pending", "confirmed", "completed", "cancelled"]),
-      scheduledAt: zod.coerce.date().nullish(),
-      notes: zod.string().nullish(),
-      totalPrice: zod.number().nullish(),
-      customerName: zod.string().nullish(),
-      artistName: zod.string().nullish(),
-      serviceName: zod.string().nullish(),
-      createdAt: zod.coerce.date(),
-    }),
-  ),
 });

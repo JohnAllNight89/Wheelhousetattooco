@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Api
  * Wheelhouse Tattoo Platform API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 
 export interface UpsertArtistBody {
@@ -14,7 +14,6 @@ export interface UpsertArtistBody {
   city: string;
   styles: string[];
   portfolioImages?: string[];
-  hourlyRate?: number;
   available: boolean;
   instagramHandle?: string;
   yearsExperience?: number;
