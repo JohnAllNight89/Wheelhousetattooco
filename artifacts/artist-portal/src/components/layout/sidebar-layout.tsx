@@ -3,6 +3,7 @@ import { useUser, useClerk } from "@clerk/react";
 import { LayoutDashboard, UserCircle, Calendar, LogOut, Ticket } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import logo from "@assets/grok_image_1775622274401_1775622404806.jpg";
 
 interface SidebarLayoutProps {
   children: React.ReactNode;
@@ -25,11 +26,8 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
       {/* Sidebar */}
       <aside className="w-64 flex-shrink-0 border-r border-border bg-sidebar flex flex-col">
         <div className="p-6">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-sm bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xl leading-none">W</span>
-            </div>
-            <span className="font-bold text-xl tracking-tight text-sidebar-foreground">Wheelhouse</span>
+          <Link href="/" className="flex items-center">
+            <img src={logo} alt="Wheelhouse Tattoo Co." className="h-10 w-10 object-contain" />
           </Link>
           <div className="mt-2 text-xs font-mono text-muted-foreground uppercase tracking-widest">
             Artist Portal

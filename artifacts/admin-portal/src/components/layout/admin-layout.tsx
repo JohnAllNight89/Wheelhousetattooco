@@ -8,6 +8,7 @@ import {
   LogOut 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logo from "@assets/grok_image_1775622274401_1775622404806.jpg";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -28,11 +29,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     <div className="flex min-h-screen bg-muted/30">
       <aside className="w-64 border-r bg-card flex flex-col hidden md:flex">
         <div className="p-6">
-          <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-            <div className="size-8 rounded bg-primary flex items-center justify-center text-primary-foreground">
-              W
-            </div>
-            Wheelhouse Admin
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="Wheelhouse Tattoo Co." className="h-10 w-10 object-contain" />
+            <span className="font-bold text-sm tracking-tight text-muted-foreground uppercase">Admin</span>
           </div>
         </div>
         

@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import logo from "@assets/grok_image_1775622274401_1775622404806.jpg";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -32,8 +33,8 @@ export function Navbar() {
       )}
     >
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-        <Link href="/" className="font-serif text-2xl font-bold tracking-tighter text-white uppercase">
-          Wheelhouse<span className="text-primary text-2xl tracking-normal font-sans ml-1">.</span>
+        <Link href="/" className="flex items-center">
+          <img src={logo} alt="Wheelhouse Tattoo Co." className="h-12 w-12 object-contain" />
         </Link>
 
         {/* Desktop Nav */}
