@@ -31,7 +31,7 @@ export function Footer() {
             <ul className="space-y-4 font-sans text-muted-foreground">
               <li><a href="#" className="hover:text-white transition-colors">Instagram</a></li>
               <li><a href="#" className="hover:text-white transition-colors">TikTok</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">dispatch@wheelhousetattoo.com</a></li>
+              <li><a href="mailto:info@wheelhousetattooco.com" className="hover:text-white transition-colors">info@wheelhousetattooco.com</a></li>
             </ul>
           </div>
         </div>
