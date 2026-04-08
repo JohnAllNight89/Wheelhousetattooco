@@ -34,7 +34,7 @@ export function Navbar() {
     >
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
         <Link href="/" className="flex items-center">
-          <img src={logo} alt="Wheelhouse Tattoo Co." className="h-12 w-12 object-contain" />
+          <img src={logo} alt="Wheelhouse Tattoo Co." className="h-12 w-12 object-contain" style={{ mixBlendMode: "screen" }} />
         </Link>
 
         {/* Desktop Nav */}

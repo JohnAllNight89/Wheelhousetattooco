@@ -27,7 +27,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
       <aside className="w-64 flex-shrink-0 border-r border-border bg-sidebar flex flex-col">
         <div className="p-6">
           <Link href="/" className="flex items-center">
-            <img src={logo} alt="Wheelhouse Tattoo Co." className="h-10 w-10 object-contain" />
+            <img src={logo} alt="Wheelhouse Tattoo Co." className="h-10 w-10 object-contain" style={{ mixBlendMode: "screen" }} />
           </Link>
           <div className="mt-2 text-xs font-mono text-muted-foreground uppercase tracking-widest">
             Artist Portal

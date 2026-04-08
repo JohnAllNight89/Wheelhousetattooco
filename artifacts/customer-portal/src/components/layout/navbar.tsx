@@ -8,7 +8,7 @@ export default function Navbar() {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center group">
-            <img src={logo} alt="Wheelhouse Tattoo Co." className="h-10 w-10 object-contain group-hover:scale-105 transition-transform" />
+            <img src={logo} alt="Wheelhouse Tattoo Co." className="h-10 w-10 object-contain group-hover:scale-105 transition-transform" style={{ mixBlendMode: "screen" }} />
           </Link>
         </div>
 
