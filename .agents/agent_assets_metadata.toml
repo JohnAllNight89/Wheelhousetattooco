@@ -1,0 +1,44 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "DbfdqDXugQBzKRyoFm3kE"
+uri = "file://artifacts/wheelhouse-tattoo/public/hero-bg.png"
+type = "image"
+title = "Cinematic dark tattoo studio interior"
+
+[[generated]]
+id = "p20-NsXcS4t31Uyscsof9"
+uri = "file://artifacts/wheelhouse-tattoo/public/flash-1.png"
+type = "image"
+title = "Framed traditional flash sheet"
+
+[[generated]]
+id = "pYMoxmhfnbMQ0hC97Xl04"
+uri = "file://artifacts/wheelhouse-tattoo/public/work-1.png"
+type = "image"
+title = "Blackwork tattoo close-up"
+
+[[generated]]
+id = "xo7ei0HPbXrnDqb2xbt3u"
+uri = "file://artifacts/wheelhouse-tattoo/public/work-2.png"
+type = "image"
+title = "Fine line tattoo close-up"
+
+[[generated]]
+id = "x-u53-fmicsy_-OuWbkc7"
+uri = "file://artifacts/wheelhouse-tattoo/public/artist-1.png"
+type = "image"
+title = "Tattoo artist portrait"
+
+[[generated]]
+id = "P9_7AsWTZNhpTsxgWWZj9"
+uri = "file://artifacts/wheelhouse-tattoo/public/artist-2.png"
+type = "image"
+title = "Tattoo artist portrait 2"
+
+[[generated]]
+id = "G1TeQDniUhJJ11AydmQy1"
+uri = "file://artifacts/wheelhouse-tattoo/public/exterior.png"
+type = "image"
+title = "Tattoo studio exterior at night"
