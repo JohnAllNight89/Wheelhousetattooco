@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/artist/"
+title = "Wheelhouse - Artist Portal"
+version = "1.0.0"
+id = "artifacts/artist-portal"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/artist/" ]
+localPort = 25066
+
+[services.development]
+run = "pnpm --filter @workspace/artist-portal run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/artist-portal", "run", "build" ]
+publicDir = "artifacts/artist-portal/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25066"
+BASE_PATH = "/artist/"

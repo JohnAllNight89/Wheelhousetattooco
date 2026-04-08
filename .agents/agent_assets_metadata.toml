@@ -42,3 +42,9 @@ id = "G1TeQDniUhJJ11AydmQy1"
 uri = "file://artifacts/wheelhouse-tattoo/public/exterior.png"
 type = "image"
 title = "Tattoo studio exterior at night"
+
+[[generated]]
+id = "wk73ShojKvOBk7CLPjp-Y"
+uri = "file://artifacts/artist-portal/public/hero-bg.png"
+type = "image"
+title = "Dark tattoo studio hero background"

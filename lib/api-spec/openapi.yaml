@@ -3,13 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Wheelhouse Tattoo Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: artists
+    description: Tattoo artist operations
+  - name: services
+    description: Artist service operations
+  - name: bookings
+    description: Booking operations
+  - name: customers
+    description: Customer operations
 paths:
   /healthz:
     get:
@@ -24,6 +32,367 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /artists:
+    get:
+      operationId: listArtists
+      tags: [artists]
+      summary: List all artists
+      description: Browse tattoo artists, optionally filtered by state and city
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+          description: Filter by US state (e.g. "TX")
+        - name: city
+          in: query
+          schema:
+            type: string
+          description: Filter by city
+        - name: style
+          in: query
+          schema:
+            type: string
+          description: Filter by tattoo style
+      responses:
+        "200":
+          description: List of artists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Artist"
+
+  /artists/locations:
+    get:
+      operationId: getArtistLocations
+      tags: [artists]
+      summary: Get all states and cities with artists
+      description: Returns a grouped list of states and cities where artists are located
+      responses:
+        "200":
+          description: Location data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocationSummary"
+
+  /artists/me:
+    get:
+      operationId: getMyArtistProfile
+      tags: [artists]
+      summary: Get my artist profile
+      description: Get the current authenticated artist's profile
+      responses:
+        "200":
+          description: Artist profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+        "404":
+          description: Profile not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: upsertMyArtistProfile
+      tags: [artists]
+      summary: Create or update my artist profile
+      description: Create or update the current authenticated artist's profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertArtistBody"
+      responses:
+        "200":
+          description: Updated artist profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+
+  /artists/{id}:
+    get:
+      operationId: getArtist
+      tags: [artists]
+      summary: Get artist by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Artist profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /artists/{id}/services:
+    get:
+      operationId: getArtistServices
+      tags: [services]
+      summary: Get services for an artist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+
+  /services:
+    post:
+      operationId: createService
+      tags: [services]
+      summary: Create a service
+      description: Artist creates a new service offering
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServiceBody"
+      responses:
+        "201":
+          description: Created service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+
+  /services/mine:
+    get:
+      operationId: getMyServices
+      tags: [services]
+      summary: Get my services
+      description: Artist gets their own services
+      responses:
+        "200":
+          description: List of my services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+
+  /services/{id}:
+    patch:
+      operationId: updateService
+      tags: [services]
+      summary: Update a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateServiceBody"
+      responses:
+        "200":
+          description: Updated service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+    delete:
+      operationId: deleteService
+      tags: [services]
+      summary: Delete a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /bookings:
+    get:
+      operationId: listBookings
+      tags: [bookings]
+      summary: List bookings
+      description: Returns bookings for the current user (customer sees their bookings, artist sees bookings with them)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, confirmed, completed, cancelled]
+          description: Filter by status
+      responses:
+        "200":
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a booking
+      description: Customer books an artist for a service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingBody"
+      responses:
+        "201":
+          description: Created booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/{id}:
+    get:
+      operationId: getBooking
+      tags: [bookings]
+      summary: Get booking details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /bookings/{id}/status:
+    patch:
+      operationId: updateBookingStatus
+      tags: [bookings]
+      summary: Update booking status
+      description: Artist confirms, completes, or cancels a booking
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookingStatusBody"
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /customers/me:
+    get:
+      operationId: getMyCustomerProfile
+      tags: [customers]
+      summary: Get my customer profile
+      responses:
+        "200":
+          description: Customer profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: upsertMyCustomerProfile
+      tags: [customers]
+      summary: Create or update my customer profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertCustomerBody"
+      responses:
+        "200":
+          description: Updated customer profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+
+  /dashboard/artist:
+    get:
+      operationId: getArtistDashboard
+      tags: [artists]
+      summary: Get artist dashboard summary
+      description: Summary stats for the artist's dashboard
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArtistDashboard"
+
+  /dashboard/customer:
+    get:
+      operationId: getCustomerDashboard
+      tags: [customers]
+      summary: Get customer dashboard summary
+      description: Summary stats for the customer's dashboard
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerDashboard"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +403,324 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    Artist:
+      type: object
+      properties:
+        id:
+          type: integer
+        clerkId:
+          type: string
+        name:
+          type: string
+        bio:
+          type: ["string", "null"]
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        state:
+          type: string
+        city:
+          type: string
+        styles:
+          type: array
+          items:
+            type: string
+        portfolioImages:
+          type: array
+          items:
+            type: string
+        hourlyRate:
+          type: ["number", "null"]
+        available:
+          type: boolean
+        instagramHandle:
+          type: ["string", "null"]
+        yearsExperience:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - clerkId
+        - name
+        - email
+        - state
+        - city
+        - styles
+        - portfolioImages
+        - available
+        - createdAt
+
+    UpsertArtistBody:
+      type: object
+      properties:
+        name:
+          type: string
+        bio:
+          type: string
+        phone:
+          type: string
+        state:
+          type: string
+        city:
+          type: string
+        styles:
+          type: array
+          items:
+            type: string
+        portfolioImages:
+          type: array
+          items:
+            type: string
+        hourlyRate:
+          type: number
+        available:
+          type: boolean
+        instagramHandle:
+          type: string
+        yearsExperience:
+          type: integer
+      required:
+        - name
+        - state
+        - city
+        - styles
+        - available
+
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+        artistId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        price:
+          type: number
+        durationMinutes:
+          type: integer
+        category:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - artistId
+        - name
+        - price
+        - durationMinutes
+        - category
+        - createdAt
+
+    CreateServiceBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        durationMinutes:
+          type: integer
+        category:
+          type: string
+      required:
+        - name
+        - price
+        - durationMinutes
+        - category
+
+    UpdateServiceBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        durationMinutes:
+          type: integer
+        category:
+          type: string
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        customerId:
+          type: integer
+        artistId:
+          type: integer
+        serviceId:
+          type: ["integer", "null"]
+        status:
+          type: string
+          enum: [pending, confirmed, completed, cancelled]
+        scheduledAt:
+          type: ["string", "null"]
+          format: date-time
+        notes:
+          type: ["string", "null"]
+        totalPrice:
+          type: ["number", "null"]
+        customerName:
+          type: ["string", "null"]
+        artistName:
+          type: ["string", "null"]
+        serviceName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - customerId
+        - artistId
+        - status
+        - createdAt
+
+    CreateBookingBody:
+      type: object
+      properties:
+        artistId:
+          type: integer
+        serviceId:
+          type: integer
+        scheduledAt:
+          type: string
+          format: date-time
+        notes:
+          type: string
+        totalPrice:
+          type: number
+      required:
+        - artistId
+
+    UpdateBookingStatusBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [confirmed, completed, cancelled]
+      required:
+        - status
+
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+        clerkId:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - clerkId
+        - name
+        - email
+        - createdAt
+
+    UpsertCustomerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+      required:
+        - name
+
+    LocationSummary:
+      type: object
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/StateLocation"
+      required:
+        - locations
+
+    StateLocation:
+      type: object
+      properties:
+        state:
+          type: string
+        cities:
+          type: array
+          items:
+            type: string
+        artistCount:
+          type: integer
+      required:
+        - state
+        - cities
+        - artistCount
+
+    ArtistDashboard:
+      type: object
+      properties:
+        totalBookings:
+          type: integer
+        pendingBookings:
+          type: integer
+        confirmedBookings:
+          type: integer
+        completedBookings:
+          type: integer
+        totalRevenue:
+          type: number
+        recentBookings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Booking"
+      required:
+        - totalBookings
+        - pendingBookings
+        - confirmedBookings
+        - completedBookings
+        - totalRevenue
+        - recentBookings
+
+    CustomerDashboard:
+      type: object
+      properties:
+        totalBookings:
+          type: integer
+        upcomingBookings:
+          type: integer
+        completedBookings:
+          type: integer
+        recentBookings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Booking"
+      required:
+        - totalBookings
+        - upcomingBookings
+        - completedBookings
+        - recentBookings
