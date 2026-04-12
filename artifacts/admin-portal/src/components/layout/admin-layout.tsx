@@ -30,8 +30,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <aside className="w-64 border-r bg-card flex flex-col hidden md:flex">
         <div className="p-6">
           <div className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden flex-shrink-0">
-              <img src={logo} alt="Wheelhouse Tattoo Co." className="h-10 w-10 object-contain" />
+            <div className="h-16 w-16 rounded-full bg-black flex items-center justify-center overflow-hidden flex-shrink-0">
+              <img src={logo} alt="Wheelhouse Tattoo Co." className="h-16 w-16 object-contain" />
             </div>
             <span className="font-bold text-sm tracking-tight text-muted-foreground uppercase">Admin</span>
           </div>
