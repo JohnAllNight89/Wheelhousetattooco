@@ -3,7 +3,7 @@ import { useUser, useClerk } from "@clerk/react";
 import { LayoutDashboard, UserCircle, Calendar, LogOut, Ticket } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import logo from "@assets/grok_image_1775622274401_1775622404806.jpg";
+import logo from "@assets/grok_image_1775622274401_1776016436498.jpg";
 
 interface SidebarLayoutProps {
   children: React.ReactNode;

@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import logo from "@assets/grok_image_1775622274401_1775622404806.jpg";
+import logo from "@assets/grok_image_1775622274401_1776016436498.jpg";
 
 export default function Navbar() {
   return (
