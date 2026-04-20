@@ -289,19 +289,21 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {[
                 {
-                  name: "Bubba",
-                  location: "TN · Nashville",
-                  years: "15+ yrs",
-                  styles: ["Traditional", "Bold Color", "Black & Grey"],
-                  bio: "Heavy-hitting traditional and bold color work. Bubba's pieces are built to last — saturated, clean, and unmistakably his own. From walk-in flash to large custom builds, he delivers work that holds up across the road.",
+                  name: "Bubba Irwin",
+                  location: "AZ · Scottsdale / TN · Nashville",
+                  years: "25+ yrs",
+                  accolade: "Ink Master S9 Champion",
+                  styles: ["Black & Grey Realism", "Photo-Realism", "Portraits", "Biomechanical"],
+                  bio: "Aaron \"Bubba\" Irwin is a 100% self-taught artist whose name is synonymous with elite black & grey realism. Crowned Ink Master Season 9 \"Master Shop\" champion alongside DJ Tambe, Bubba owns Old Town Ink (Scottsdale) and co-runs Glass House at Goodnight Nashville with Chris Nunez. His client list includes country stars Jason Aldean, Kane Brown, and Gary Allan.",
                   instagram: "bubbaitattoos",
                 },
                 {
                   name: "Chris Nunez",
-                  location: "FL · Miami",
-                  years: "25+ yrs",
+                  location: "FL · Miami / TN · Nashville",
+                  years: "30+ yrs",
+                  accolade: "Ink Master Judge",
                   styles: ["Japanese", "Color", "Large Scale", "Illustrative"],
-                  bio: "Large-scale Japanese, color, and bold illustrative work. Chris brings decades of refined craft to every rig — known for ambitious sleeves, back pieces, and tattoos that read clean from across the room.",
+                  bio: "Industry legend, longtime Ink Master judge, and co-owner of Handcrafted Tattoo & Art Gallery in Miami. Chris co-runs Glass House at Goodnight Nashville with Bubba Irwin. Known for ambitious large-scale Japanese and color work, his decades of refined craft set the standard for every rig in the fleet.",
                   instagram: "chrisnunezlibertycity",
                 },
               ].map((artist, idx) => (
@@ -320,6 +322,11 @@ export default function Home() {
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                    {artist.accolade && (
+                      <div className="absolute top-4 right-4 bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 font-bold">
+                        {artist.accolade}
+                      </div>
+                    )}
                     <div className="absolute bottom-0 left-0 p-6">
                       <span className="font-mono text-xs uppercase tracking-widest text-primary">{artist.location}</span>
                       <h3 className="font-serif text-4xl text-white uppercase mt-1">{artist.name}</h3>
