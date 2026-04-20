@@ -269,41 +269,88 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 5. Gallery / Vibe Section */}
-        <section className="py-32 bg-black border-y border-border">
+        {/* 5. Featured Artists Section */}
+        <section id="artists" className="py-32 md:py-48 bg-black border-y border-border">
           <div className="container mx-auto px-6 md:px-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="aspect-square relative overflow-hidden border border-border"
-              >
-                <img src="/artist-portrait.png" alt="Artist at Work" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0" />
-                <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-              </motion.div>
-              <div className="flex flex-col gap-8">
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-20"
+            >
+              <h3 className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-4">The Talent</h3>
+              <h2 className="font-serif text-5xl md:text-6xl text-white uppercase">Meet The <span className="italic tracking-normal text-muted-foreground">Artists</span></h2>
+              <p className="font-sans text-muted-foreground text-lg max-w-2xl mx-auto mt-6">
+                Hand-picked talent driving the fleet. World-class craft, road-ready discipline, and work that holds up anywhere.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              {[
+                {
+                  name: "Bubba",
+                  location: "TN · Nashville",
+                  years: "15+ yrs",
+                  styles: ["Traditional", "Bold Color", "Black & Grey"],
+                  bio: "Heavy-hitting traditional and bold color work. Bubba's pieces are built to last — saturated, clean, and unmistakably his own. From walk-in flash to large custom builds, he delivers work that holds up across the road.",
+                  instagram: "bubbaitattoos",
+                },
+                {
+                  name: "Chris Nunez",
+                  location: "FL · Miami",
+                  years: "25+ yrs",
+                  styles: ["Japanese", "Color", "Large Scale", "Illustrative"],
+                  bio: "Large-scale Japanese, color, and bold illustrative work. Chris brings decades of refined craft to every rig — known for ambitious sleeves, back pieces, and tattoos that read clean from across the room.",
+                  instagram: "chrisnunezlibertycity",
+                },
+              ].map((artist, idx) => (
+                <motion.div
+                  key={artist.instagram}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                  className="aspect-video relative overflow-hidden border border-border"
+                  transition={{ duration: 0.8, delay: idx * 0.2 }}
+                  className="border border-border bg-card/30 hover:border-primary transition-colors flex flex-col group overflow-hidden"
                 >
-                  <img src="/event-atmosphere.png" alt="Event Atmosphere" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000" />
+                  <div className="aspect-[4/3] relative overflow-hidden border-b border-border bg-gradient-to-br from-zinc-900 to-black">
+                    <img 
+                      src="/artist-portrait.png" 
+                      alt={`${artist.name} at Work`} 
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 p-6">
+                      <span className="font-mono text-xs uppercase tracking-widest text-primary">{artist.location}</span>
+                      <h3 className="font-serif text-4xl text-white uppercase mt-1">{artist.name}</h3>
+                    </div>
+                  </div>
+                  <div className="p-8 flex flex-col flex-grow">
+                    <div className="flex flex-wrap gap-2 mb-5">
+                      {artist.styles.map((style) => (
+                        <span 
+                          key={style}
+                          className="font-mono text-xs uppercase tracking-wider text-muted-foreground border border-border px-3 py-1"
+                        >
+                          {style}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="font-sans text-muted-foreground mb-8 flex-grow">{artist.bio}</p>
+                    <div className="flex items-center justify-between border-t border-border pt-5">
+                      <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">{artist.years} experience</span>
+                      <a 
+                        href={`https://www.instagram.com/${artist.instagram}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-sm uppercase tracking-widest text-primary hover:text-white transition-colors flex items-center gap-2 font-bold"
+                      >
+                        Portfolio <ArrowRight className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
                 </motion.div>
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                  className="aspect-video relative overflow-hidden border border-border bg-card p-12 flex flex-col justify-center"
-                >
-                  <h3 className="font-serif text-3xl text-white mb-4 uppercase">Zero Compromise</h3>
-                  <p className="font-sans text-muted-foreground">Every session in the rig feels identical to walking into a high-end private studio. The music, the lighting, the cleanliness. You forget you're standing in the middle of a 40,000 person festival.</p>
-                </motion.div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
