@@ -286,7 +286,7 @@ export default function Home() {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 gap-8 max-w-md mx-auto">
               {[
                 {
                   name: "Bubba Irwin",
@@ -294,19 +294,9 @@ export default function Home() {
                   years: "25+ yrs",
                   accolade: "Ink Master S9 Champion",
                   styles: ["Black & Grey Realism", "Photo-Realism", "Portraits", "Biomechanical"],
-                  bio: "Aaron \"Bubba\" Irwin is a 100% self-taught artist whose name is synonymous with elite black & grey realism. Crowned Ink Master Season 9 \"Master Shop\" champion alongside DJ Tambe, Bubba owns Old Town Ink (Scottsdale) and co-runs Glass House at Goodnight Nashville with Chris Nunez. His client list includes country stars Jason Aldean, Kane Brown, and Gary Allan.",
+                  bio: "Aaron \"Bubba\" Irwin is a 100% self-taught artist whose name is synonymous with elite black & grey realism. Crowned Ink Master Season 9 \"Master Shop\" champion alongside DJ Tambe, Bubba owns Old Town Ink (Scottsdale) and co-runs Glass House at Goodnight Nashville. His client list includes country stars Jason Aldean, Kane Brown, and Gary Allan.",
                   instagram: "bubbaitattoos",
                   image: "/bubba-irwin.jpg",
-                },
-                {
-                  name: "Chris Nunez",
-                  location: "FL · Miami / TN · Nashville",
-                  years: "30+ yrs",
-                  accolade: "Ink Master Judge",
-                  styles: ["Japanese", "Color", "Large Scale", "Illustrative"],
-                  bio: "Industry legend, longtime Ink Master judge, and co-owner of Handcrafted Tattoo & Art Gallery in Miami. Chris co-runs Glass House at Goodnight Nashville with Bubba Irwin. Known for ambitious large-scale Japanese and color work, his decades of refined craft set the standard for every rig in the fleet.",
-                  instagram: "chrisnunezlibertycity",
-                  image: "/artist-portrait.png",
                 },
               ].map((artist, idx) => (
                 <motion.div
