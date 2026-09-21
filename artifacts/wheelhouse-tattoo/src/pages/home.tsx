@@ -296,6 +296,7 @@ export default function Home() {
                   styles: ["Black & Grey Realism", "Photo-Realism", "Portraits", "Biomechanical"],
                   bio: "Aaron \"Bubba\" Irwin is a 100% self-taught artist whose name is synonymous with elite black & grey realism. Crowned Ink Master Season 9 \"Master Shop\" champion alongside DJ Tambe, Bubba owns Old Town Ink (Scottsdale) and co-runs Glass House at Goodnight Nashville with Chris Nunez. His client list includes country stars Jason Aldean, Kane Brown, and Gary Allan.",
                   instagram: "bubbaitattoos",
+                  image: "/bubba-irwin.jpg",
                 },
                 {
                   name: "Chris Nunez",
@@ -305,6 +306,7 @@ export default function Home() {
                   styles: ["Japanese", "Color", "Large Scale", "Illustrative"],
                   bio: "Industry legend, longtime Ink Master judge, and co-owner of Handcrafted Tattoo & Art Gallery in Miami. Chris co-runs Glass House at Goodnight Nashville with Bubba Irwin. Known for ambitious large-scale Japanese and color work, his decades of refined craft set the standard for every rig in the fleet.",
                   instagram: "chrisnunezlibertycity",
+                  image: "/artist-portrait.png",
                 },
               ].map((artist, idx) => (
                 <motion.div
@@ -316,9 +318,9 @@ export default function Home() {
                   className="border border-border bg-card/30 hover:border-primary transition-colors flex flex-col group overflow-hidden"
                 >
                   <div className="aspect-[4/3] relative overflow-hidden border-b border-border bg-gradient-to-br from-zinc-900 to-black">
-                    <img 
-                      src="/artist-portrait.png" 
-                      alt={`${artist.name} at Work`} 
+                    <img
+                      src={artist.image}
+                      alt={`${artist.name} at Work`}
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
